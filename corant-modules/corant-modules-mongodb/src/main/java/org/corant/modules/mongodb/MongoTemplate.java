@@ -2112,7 +2112,7 @@ public class MongoTemplate {
       } else {
         final String[] fieldNamePath = Names.splitNameSpace(fieldName, false, false);
         if (fieldNamePath.length == 1) {
-          return toObject(result.get(fieldName), clazz);
+          return toObject(result.get(fieldNamePath[0]), clazz);
         } else {
           return toObject(getMapKeyPathValue(result, fieldNamePath, false), clazz);
         }
@@ -2135,7 +2135,7 @@ public class MongoTemplate {
       } else {
         final String[] fieldNamePath = Names.splitNameSpace(fieldName, false, false);
         if (fieldNamePath.length == 1) {
-          return result.stream().map(r -> toObject(r.get(fieldName), clazz))
+          return result.stream().map(r -> toObject(r.get(fieldNamePath[0]), clazz))
               .collect(Collectors.toList());
         } else {
           return result.stream().map(r -> getMapKeyPathValue(r, fieldNamePath, false))
@@ -2157,7 +2157,7 @@ public class MongoTemplate {
       projection(fieldName);
       final String[] fieldNamePath = Names.splitNameSpace(fieldName, false, false);
       if (fieldNamePath.length == 1) {
-        return stream().map(r -> toObject(r.get(fieldName), clazz));
+        return stream().map(r -> toObject(r.get(fieldNamePath[0]), clazz));
       } else {
         return stream().map(r -> getMapKeyPathValue(r, fieldNamePath, false))
             .map(r -> toObject(r, clazz));
