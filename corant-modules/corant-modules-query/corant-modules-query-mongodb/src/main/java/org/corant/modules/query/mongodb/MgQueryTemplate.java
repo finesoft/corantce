@@ -58,6 +58,7 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Collation;
+import com.mongodb.client.model.Projections;
 import net.jcip.annotations.NotThreadSafe;
 
 /**
@@ -609,6 +610,17 @@ public class MgQueryTemplate {
    */
   public MgQueryTemplate projection(Bson projection) {
     this.projection = projection;
+    return this;
+  }
+
+  /**
+   * @see FindIterable#projection(Bson)
+   * @see Projections#include(String...)
+   */
+  public MgQueryTemplate projection(String... includeFieldNames) {
+    if (isNotEmpty(includeFieldNames)) {
+      projection = Projections.include(includeFieldNames);
+    }
     return this;
   }
 

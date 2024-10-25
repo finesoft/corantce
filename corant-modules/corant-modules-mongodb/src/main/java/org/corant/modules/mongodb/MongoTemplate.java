@@ -20,11 +20,16 @@ import static org.corant.modules.mongodb.Mongos.READ_OBJECT_MAPPER;
 import static org.corant.modules.mongodb.Mongos.WRITE_DOC_MAP_TYPE;
 import static org.corant.modules.mongodb.Mongos.WRITE_OBJECT_MAPPER;
 import static org.corant.shared.ubiquity.Throwing.uncheckedFunction;
+import static org.corant.shared.util.Assertions.shouldBeTrue;
 import static org.corant.shared.util.Assertions.shouldNotBlank;
 import static org.corant.shared.util.Assertions.shouldNotEmpty;
 import static org.corant.shared.util.Assertions.shouldNotNull;
+import static org.corant.shared.util.Conversions.toObject;
+import static org.corant.shared.util.Empties.isEmpty;
+import static org.corant.shared.util.Empties.isNotEmpty;
 import static org.corant.shared.util.Lists.listOf;
 import static org.corant.shared.util.Lists.transform;
+import static org.corant.shared.util.Maps.getMapKeyPathValue;
 import static org.corant.shared.util.Objects.defaultObject;
 import static org.corant.shared.util.Objects.forceCast;
 import static org.corant.shared.util.Streams.streamOf;
@@ -46,6 +51,7 @@ import org.bson.Document;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.conversions.Bson;
 import org.corant.modules.bson.Bsons;
+import org.corant.shared.normal.Names;
 import org.corant.shared.util.Objects;
 import org.corant.shared.util.Strings;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -77,6 +83,7 @@ import com.mongodb.client.model.DropCollectionOptions;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.InsertManyOptions;
 import com.mongodb.client.model.InsertOneOptions;
+import com.mongodb.client.model.Projections;
 import com.mongodb.client.model.ReplaceOneModel;
 import com.mongodb.client.model.ReplaceOptions;
 import com.mongodb.client.model.UpdateOptions;
@@ -156,6 +163,10 @@ public class MongoTemplate {
 
   public MongoAggregate aggregate() {
     return new MongoAggregate(this);
+  }
+
+  public MongoAggregate aggregate(String collectionName) {
+    return new MongoAggregate(this).collectionName(collectionName);
   }
 
   /**
@@ -811,6 +822,13 @@ public class MongoTemplate {
     return new MongoQuery(this);
   }
 
+  /**
+   * Returns a new {@link MongoQuery} instance with specifies collection name.
+   */
+  public MongoQuery query(String collectionName) {
+    return new MongoQuery(this).collectionName(collectionName);
+  }
+
   public MongoTemplate readObjectMapper(ObjectMapper objectMapper) {
     if (objectMapper != null) {
       readObjectMapper = objectMapper;
@@ -1258,7 +1276,7 @@ public class MongoTemplate {
     public <T> List<T> aggregateAs(Class<T> klass) {
       try (MongoCursor<Document> cursor = doAggregate().iterator()) {
         return streamOf(cursor).map(a -> tpl.convertDocument(a, klass)).onClose(cursor::close)
-            .toList();
+            .collect(Collectors.toList());
       }
     }
 
@@ -2009,6 +2027,17 @@ public class MongoTemplate {
     }
 
     /**
+     * @see FindIterable#projection(Bson)
+     * @see Projections#include(String...)
+     */
+    public MongoQuery projection(String... includeFieldNames) {
+      if (isNotEmpty(includeFieldNames)) {
+        projection = Projections.include(includeFieldNames);
+      }
+      return this;
+    }
+
+    /**
      * Set the projections
      *
      * @param includePropertyNames the include property names
@@ -2065,6 +2094,74 @@ public class MongoTemplate {
     public MongoQuery simpleComment(Object comment) {
       this.comment = Bsons.toSimpleBsonValue(comment);
       return this;
+    }
+
+    /**
+     * Returns a single document field value in the collection according to the given options.
+     *
+     * @param <T> the type to which the property of document is to be converted
+     * @param fieldName the field name to be retrieved
+     * @param clazz the class to which the field of document is to be converted
+     */
+    public <T> T single(final String fieldName, final Class<T> clazz) {
+      shouldBeTrue(isNotBlank(fieldName) && clazz != null);
+      projection(fieldName);
+      Map<String, Object> result = findOne();
+      if (isEmpty(result)) {
+        return null;
+      } else {
+        final String[] fieldNamePath = Names.splitNameSpace(fieldName, false, false);
+        if (fieldNamePath.length == 1) {
+          return toObject(result.get(fieldName), clazz);
+        } else {
+          return toObject(getMapKeyPathValue(result, fieldNamePath, false), clazz);
+        }
+      }
+    }
+
+    /**
+     * Returns a single document field value list in the collection according to the given options.
+     *
+     * @param <T> the type to which the property of document is to be converted
+     * @param fieldName the field name to be retrieved
+     * @param clazz the class to which the field of document is to be converted
+     */
+    public <T> List<T> singles(final String fieldName, final Class<T> clazz) {
+      shouldBeTrue(isNotBlank(fieldName) && clazz != null);
+      projection(fieldName);
+      List<Map<String, Object>> result = find();
+      if (isEmpty(result)) {
+        return null;
+      } else {
+        final String[] fieldNamePath = Names.splitNameSpace(fieldName, false, false);
+        if (fieldNamePath.length == 1) {
+          return result.stream().map(r -> toObject(r.get(fieldName), clazz))
+              .collect(Collectors.toList());
+        } else {
+          return result.stream().map(r -> getMapKeyPathValue(r, fieldNamePath, false))
+              .map(r -> toObject(r, clazz)).collect(Collectors.toList());
+        }
+      }
+    }
+
+    /**
+     * Returns a single document field value stream in the collection according to the given
+     * options.
+     *
+     * @param <T> the type to which the property of document is to be converted
+     * @param fieldName the field name to be retrieved
+     * @param clazz the class to which the field of document is to be converted
+     */
+    public <T> Stream<T> singleStream(String fieldName, final Class<T> clazz) {
+      shouldBeTrue(isNotBlank(fieldName) && clazz != null);
+      projection(fieldName);
+      final String[] fieldNamePath = Names.splitNameSpace(fieldName, false, false);
+      if (fieldNamePath.length == 1) {
+        return stream().map(r -> toObject(r.get(fieldName), clazz));
+      } else {
+        return stream().map(r -> getMapKeyPathValue(r, fieldNamePath, false))
+            .map(r -> toObject(r, clazz));
+      }
     }
 
     /**
