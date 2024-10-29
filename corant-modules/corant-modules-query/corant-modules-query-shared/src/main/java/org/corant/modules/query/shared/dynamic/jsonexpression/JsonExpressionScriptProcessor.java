@@ -28,7 +28,6 @@ import static org.corant.shared.util.Empties.isEmpty;
 import static org.corant.shared.util.Empties.isNotEmpty;
 import static org.corant.shared.util.Maps.getMapBoolean;
 import static org.corant.shared.util.Maps.getMapMap;
-import static org.corant.shared.util.Maps.getMapObject;
 import static org.corant.shared.util.Maps.getMapString;
 import static org.corant.shared.util.Objects.defaultObject;
 import static org.corant.shared.util.Objects.forceCast;
@@ -276,7 +275,7 @@ public class JsonExpressionScriptProcessor extends AbstractScriptProcessor {
               String typeName = getMapString(vm, PROJECTION_TYPE_KEY);
               Class<?> type = typeName != null ? asClass(typeName) : null;
               // parse evaluation DSL
-              Object evalScript = getMapObject(vm, EVAL_KEY);
+              Object evalScript = vm.get(EVAL_KEY);
               Node<Object> evalNode = null;
               if (evalScript instanceof Map<?, ?> map) {
                 evalNode = forceCast(SimpleParser.parse(map, MyASTNodeBuilder.INST));
@@ -304,9 +303,23 @@ public class JsonExpressionScriptProcessor extends AbstractScriptProcessor {
                   }
                 }
               }
-              mappings.add(new ProjectionMapping(keyPath, renames, evalNode, type));
+              // parse injection sub-filter
+              Object filterScript = vm.get(FILTER_KEY);
+              if (filterScript != null && evalNode != null) {
+                throw new QueryRuntimeException(
+                    "The %s projection error, 'filter' and 'eval' can't be used together!", k);
+              }
+              Node<Object> filterNode = null;
+              if (filterScript instanceof Map<?, ?> map) {
+                filterNode = forceCast(SimpleParser.parse(map, MyASTNodeBuilder.INST));
+              } else if (filterScript != null) {
+                throw new QueryRuntimeException(
+                    "The %s projection error, 'filter' can only be a Map!", k);
+              }
+              mappings.add(new ProjectionMapping(keyPath, renames, evalNode, filterNode, type));
             } else if (toBoolean(v)) {
-              mappings.add(new ProjectionMapping(keyPath, singletonList(keyPath), null, null));
+              mappings
+                  .add(new ProjectionMapping(keyPath, singletonList(keyPath), null, null, null));
             }
           }
         }
@@ -473,6 +486,7 @@ public class JsonExpressionScriptProcessor extends AbstractScriptProcessor {
     protected Map<Object, Object> parentResult;
     protected Map<Object, Object> fetchResult;
     protected List<Map<Object, Object>> fetchResults;
+    protected Object projectionElement;
 
     public MyEvaluationContext(QueryObjectMapper objectMapper, Object queryParameter,
         List<FunctionResolver> functionResolvers) {
@@ -502,6 +516,9 @@ public class JsonExpressionScriptProcessor extends AbstractScriptProcessor {
       } else if (FETCHED_RESULTS_FUNC_PARAMETER_NAME.equals(rootName)) {
         // handle fetch results variable: @frs
         return fetchResults;
+      } else if (FETCHED_RESULT_ELEMENT_FUNC_PARAMETER_NAME.equals(rootName)) {
+        // handle fetch result element variable: @fre.[field name]
+        return objectMapper.getMappedValue(projectionElement, namePath);
       } else {
         // handle query parameter: @p.criteria.[criterion name] or @p.context.[context key]
         if (!queryParamMapResolved) {
@@ -534,10 +551,16 @@ public class JsonExpressionScriptProcessor extends AbstractScriptProcessor {
       return this;
     }
 
+    protected MyEvaluationContext bindProjectionElement(Object element) {
+      projectionElement = element;
+      return this;
+    }
+
     protected MyEvaluationContext unbindAllResults() {
       parentResult = null;
       fetchResult = null;
       fetchResults = null;
+      projectionElement = null;
       return this;
     }
   }
@@ -558,12 +581,14 @@ public class JsonExpressionScriptProcessor extends AbstractScriptProcessor {
     protected final List<String[]> injectPaths;
     protected final Class<?> type;
     protected final Node<Object> evalNode;
+    protected final Node<Object> filterNode;
 
     protected ProjectionMapping(String[] extractPath, List<String[]> injectPaths,
-        Node<Object> evalNode, Class<?> type) {
+        Node<Object> evalNode, Node<Object> filterNode, Class<?> type) {
       this.extractPath = extractPath;
       this.injectPaths = injectPaths;
       this.evalNode = evalNode;
+      this.filterNode = filterNode;
       this.type = type;
     }
 
@@ -649,9 +674,24 @@ public class JsonExpressionScriptProcessor extends AbstractScriptProcessor {
       } else {
         // extract the field value from the fetched result
         extracted = mapper.getMappedValue(fetchResult, mapping.extractPath);
+        if (mapping.filterNode != null) {
+          evalCtx.bindFetchResult((Map<Object, Object>) fetchResult);
+          if (extracted instanceof Collection<?> collection) {
+            List<Object> filtereds = new ArrayList<>(collection.size());
+            for (Object element : collection) {
+              if ((Boolean) mapping.filterNode.getValue(evalCtx.bindProjectionElement(element))) {
+                filtereds.add(element);
+              }
+            }
+            extracted = filtereds;
+          } else if (!((Boolean) mapping.filterNode
+              .getValue(evalCtx.bindProjectionElement(extracted)))) {
+            extracted = null;
+          }
+        }
       }
       // convert the field value to the target type if necessary
-      if (mapping.type != null) {
+      if (mapping.type != null && extracted != null) {
         extracted = toObject(extracted, mapping.type);
       }
       return extracted;

@@ -132,7 +132,7 @@ public class ResultBeanMapperHintHandler implements ResultHintHandler {
         return;
       }
       for (ResultBeanMapper mapper : mappers) {
-        mapper.accept(query, parameter, resolveExtraParams(qh), list);
+        mapper.accept(query, qh, parameter, resolveExtraParams(qh), list);
       }
     }
   }
@@ -184,8 +184,7 @@ public class ResultBeanMapperHintHandler implements ResultHintHandler {
             value = toObject(v.get(0).getValue(), v.get(0).getType());
           }
         } else if (size > 0) {
-          value =
-              v.stream().map(e -> toObject(e.getValue(), e.getType())).collect(Collectors.toList());
+          value = v.stream().map(e -> toObject(e.getValue(), e.getType())).toList();
         }
         map.put(k, value);
       });
@@ -207,11 +206,12 @@ public class ResultBeanMapperHintHandler implements ResultHintHandler {
      * @param query the query object
      * @param queryParameter the parameters of the query corresponding to hint when executing the
      *        query
+     * @param queryHint query hint
      * @param extraParameters the extra parameters from query configuration
      * @param queryResult query result set of query corresponding to hint
      **/
-    void accept(Query query, Object queryParameter, Map<String, Object> extraParameters,
-        List<Map<Object, Object>> queryResult);
+    void accept(Query query, QueryHint queryHint, Object queryParameter,
+        Map<String, Object> extraParameters, List<Map<Object, Object>> queryResult);
 
   }
 

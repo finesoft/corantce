@@ -44,6 +44,7 @@ public interface ScriptProcessor extends Sortable, AfterQueryMappingInitializedH
   String RESULTS_FUNC_PARAMETER_NAME = "rs";
   String FETCH_QUERY_FUNC_PARAMETER_NAME = "fq";
   String FETCHED_RESULT_FUNC_PARAMETER_NAME = "fr";
+  String FETCHED_RESULT_ELEMENT_FUNC_PARAMETER_NAME = "fre";
   String FETCHED_RESULTS_FUNC_PARAMETER_NAME = "frs";
 
   boolean USING_INTEGRITY_FUNCTIONS = Configurations.getConfigValue(
