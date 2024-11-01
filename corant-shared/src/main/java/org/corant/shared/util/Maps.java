@@ -13,10 +13,12 @@
  */
 package org.corant.shared.util;
 
+import static org.corant.shared.util.Assertions.shouldNotEmpty;
 import static org.corant.shared.util.Assertions.shouldNotNull;
 import static org.corant.shared.util.Conversions.toList;
 import static org.corant.shared.util.Conversions.toObject;
 import static org.corant.shared.util.Conversions.toSet;
+import static org.corant.shared.util.Empties.isNotEmpty;
 import static org.corant.shared.util.Functions.emptyPredicate;
 import static org.corant.shared.util.Objects.asString;
 import static org.corant.shared.util.Objects.asStrings;
@@ -1334,7 +1336,7 @@ public class Maps {
     Object obj = map == null ? null : map.remove(key);
     if (obj == null) {
       return Optional.empty();
-    } else if (hints.length > 0) {
+    } else if (isNotEmpty(hints)) {
       return Optional.ofNullable(toObject(obj, clazz, mapOf(hints)));
     } else {
       return Optional.ofNullable(toObject(obj, clazz));
@@ -1357,7 +1359,7 @@ public class Maps {
     Object obj = map == null ? null : map.remove(key);
     if (obj == null) {
       return Optional.empty();
-    } else if (hints.length > 0) {
+    } else if (isNotEmpty(hints)) {
       return Optional.ofNullable(toObject(obj, type, mapOf(hints)));
     } else {
       return Optional.ofNullable(toObject(obj, type));
@@ -1377,6 +1379,7 @@ public class Maps {
 
   @SuppressWarnings("unchecked")
   public static <K, V> Map<K, V> putMapKeyValue(Map<K, V> target, Object... objects) {
+    shouldNotEmpty(objects, "Key paths can't empty");
     int oLen = objects.length;
     if (oLen == 2) {
       target.put((K) objects[0], (V) objects[1]);
@@ -1419,8 +1422,10 @@ public class Maps {
 
   @SafeVarargs
   public static <K, V> Map<K, V> removeMap(Map<K, V> target, K... keys) {
-    for (K key : keys) {
-      target.remove(key);
+    if (isNotEmpty(keys)) {
+      for (K key : keys) {
+        target.remove(key);
+      }
     }
     return target;
   }
@@ -1598,9 +1603,11 @@ public class Maps {
   @SafeVarargs
   public static <K, V> Map<K, V> union(Map<? extends K, ? extends V>... maps) {
     Map<K, V> union = new HashMap<>();
-    for (Map<? extends K, ? extends V> map : maps) {
-      if (map != null) {
-        union.putAll(map);
+    if (isNotEmpty(maps)) {
+      for (Map<? extends K, ? extends V> map : maps) {
+        if (map != null) {
+          union.putAll(map);
+        }
       }
     }
     return union;

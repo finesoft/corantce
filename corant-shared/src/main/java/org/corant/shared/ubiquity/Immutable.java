@@ -13,6 +13,7 @@
  */
 package org.corant.shared.ubiquity;
 
+import static org.corant.shared.util.Empties.isNotEmpty;
 import static org.corant.shared.util.Maps.mapOf;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -57,7 +58,7 @@ public interface Immutable {
 
     @SuppressWarnings("unchecked")
     public ImmutableListBuilder<E> addAll(final E... eles) {
-      if (eles.length > 0) {
+      if (isNotEmpty(eles)) {
         Collections.addAll(list, eles);
       }
       return this;
@@ -110,8 +111,10 @@ public interface Immutable {
 
     @SuppressWarnings("unchecked")
     public ImmutableListBuilder<E> removeAll(final E... eles) {
-      for (E ele : eles) {
-        list.remove(ele);
+      if (isNotEmpty(eles)) {
+        for (E ele : eles) {
+          list.remove(ele);
+        }
       }
       return this;
     }
@@ -184,7 +187,7 @@ public interface Immutable {
     }
 
     public ImmutableMapBuilder<K, V> putAll(final Object... eles) {
-      if (eles.length > 0) {
+      if (eles != null && eles.length > 0) {
         Map<K, V> newMap = mapOf(eles);
         putAll(newMap);
       }
@@ -224,7 +227,7 @@ public interface Immutable {
 
     @SuppressWarnings("unchecked")
     public ImmutableSetBuilder<E> addAll(final E... eles) {
-      if (eles.length > 0) {
+      if (eles != null && eles.length > 0) {
         Collections.addAll(set, eles);
       }
       return this;
@@ -277,8 +280,10 @@ public interface Immutable {
 
     @SuppressWarnings("unchecked")
     public ImmutableSetBuilder<E> removeAll(final E... eles) {
-      for (E ele : eles) {
-        set.remove(ele);
+      if (eles != null) {
+        for (E ele : eles) {
+          set.remove(ele);
+        }
       }
       return this;
     }

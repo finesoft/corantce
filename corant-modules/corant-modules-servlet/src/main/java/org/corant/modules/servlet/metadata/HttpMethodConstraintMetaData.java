@@ -15,6 +15,7 @@ package org.corant.modules.servlet.metadata;
 
 import static org.corant.shared.util.Configurations.getAllAssembledConfigValues;
 import static org.corant.shared.util.Configurations.getAssembledConfigValue;
+import static org.corant.shared.util.Empties.isNotEmpty;
 import static org.corant.shared.util.Objects.defaultObject;
 import java.util.Arrays;
 import jakarta.servlet.annotation.HttpMethodConstraint;
@@ -28,6 +29,8 @@ import org.corant.shared.util.Strings;
  * @author bingo 上午11:00:53
  */
 public class HttpMethodConstraintMetaData {
+
+  public static final HttpMethodConstraintMetaData[] EMPTY_ARRAY = {};
 
   private String value;
 
@@ -65,8 +68,11 @@ public class HttpMethodConstraintMetaData {
   protected HttpMethodConstraintMetaData() {}
 
   public static HttpMethodConstraintMetaData[] of(HttpMethodConstraint... constraints) {
-    return Arrays.stream(constraints).map(HttpMethodConstraintMetaData::new)
-        .toArray(HttpMethodConstraintMetaData[]::new);
+    if (isNotEmpty(constraints)) {
+      return Arrays.stream(constraints).map(HttpMethodConstraintMetaData::new)
+          .toArray(HttpMethodConstraintMetaData[]::new);
+    }
+    return EMPTY_ARRAY;
   }
 
   /**

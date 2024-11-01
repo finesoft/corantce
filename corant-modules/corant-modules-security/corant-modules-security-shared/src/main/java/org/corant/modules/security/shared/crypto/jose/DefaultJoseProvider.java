@@ -120,7 +120,7 @@ public class DefaultJoseProvider implements JoseProvider {
   }
 
   public static JsonWebKeySet wrapJsonWebKeySet(PublicKey... keys) {
-    shouldBeTrue(keys.length > 0
+    shouldBeTrue(keys != null && keys.length > 0
         && Arrays.stream(keys).allMatch(k -> k instanceof RSAKey || k instanceof ECKey));
     List<JsonWebKey> set = new ArrayList<>();
     for (PublicKey key : keys) {

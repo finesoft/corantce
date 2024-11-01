@@ -16,6 +16,7 @@ package org.corant.modules.jpa.shared.metadata;
 import static java.lang.String.format;
 import static org.corant.shared.util.Assertions.shouldBeTrue;
 import static org.corant.shared.util.Classes.getUserClass;
+import static org.corant.shared.util.Empties.isNotEmpty;
 import static org.corant.shared.util.Empties.sizeOf;
 import static org.corant.shared.util.Objects.defaultObject;
 import static org.corant.shared.util.Strings.isBlank;
@@ -132,7 +133,9 @@ public class PersistenceUnitInfoMetaData implements PersistenceUnitInfo {
 
   public PersistenceUnitInfoMetaData configTransformers(ClassTransformer... classTransformers) {
     transformers.clear();
-    Collections.addAll(transformers, classTransformers);
+    if (isNotEmpty(classTransformers)) {
+      Collections.addAll(transformers, classTransformers);
+    }
     return this;
   }
 

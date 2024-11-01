@@ -13,10 +13,10 @@
  */
 package org.corant.shared.util;
 
-import static org.corant.shared.util.Lists.append;
-import static org.corant.shared.util.Lists.appendIfAbsent;
-import static org.corant.shared.util.Lists.distinct;
-import static org.corant.shared.util.Lists.removeIf;
+import static org.corant.shared.util.Objects.append;
+import static org.corant.shared.util.Objects.appendIfAbsent;
+import static org.corant.shared.util.Objects.distinct;
+import static org.corant.shared.util.Objects.removeIf;
 import static org.junit.Assert.assertArrayEquals;
 import java.time.Instant;
 import java.util.concurrent.atomic.AtomicLong;
@@ -33,8 +33,8 @@ public class ListsTest extends TestCase {
 
   @Test
   public void testArrayAppend() {
-    String[] array = new String[] {"a", "b", "c"};
-    String[] appendArray = new String[] {"a", "b", "c", "d"};
+    String[] array = {"a", "b", "c"};
+    String[] appendArray = {"a", "b", "c", "d"};
     assertArrayEquals(append(array, "d"), appendArray);
     array = Strings.EMPTY_ARRAY;
     assertArrayEquals(append(array, "a"), new String[] {"a"});
@@ -48,8 +48,8 @@ public class ListsTest extends TestCase {
 
   @Test
   public void testArrayAppendIfAbsent() {
-    String[] array = new String[] {"a", "b", "c"};
-    String[] appendArray = new String[] {"a", "b", "c", "d"};
+    String[] array = {"a", "b", "c"};
+    String[] appendArray = {"a", "b", "c", "d"};
     assertArrayEquals(appendIfAbsent(array, "d", "d", "d"), appendArray);
     assertArrayEquals(appendIfAbsent(array, "a", "c", "b"), array);
     assertArrayEquals(appendIfAbsent(array), array);
@@ -62,7 +62,7 @@ public class ListsTest extends TestCase {
 
   @Test
   public void testArrayDistinct() {
-    String[] array = new String[] {"a", "b", "c"};
+    String[] array = {"a", "b", "c"};
     assertArrayEquals(distinct(array), array);
     array = new String[0];
     assertArrayEquals(distinct(array), array);
@@ -73,10 +73,10 @@ public class ListsTest extends TestCase {
 
   @Test
   public void testArrayRemove() {
-    String[] array = new String[] {"a"};
+    String[] array = {"a"};
     String[] removedArray = Strings.EMPTY_ARRAY;
-    assertArrayEquals(removeIf(array, x -> x.equals("a")), removedArray);
-    assertArrayEquals(removeIf(array, x -> x.equals("x")), array);
+    assertArrayEquals(removeIf(array, "a"::equals), removedArray);
+    assertArrayEquals(removeIf(array, "x"::equals), array);
   }
 
   public static class SnowflakeIpv4L2sUUIDGenerator {
@@ -209,8 +209,7 @@ public class ListsTest extends TestCase {
     public int hashCode() {
       final int prime = 31;
       int result = 1;
-      result = prime * result + (int) (workerId ^ workerId >>> 32);
-      return result;
+      return prime * result + (int) (workerId ^ workerId >>> 32);
     }
 
     protected synchronized Long doGenerateWithCache(Supplier<?> timeGener) {

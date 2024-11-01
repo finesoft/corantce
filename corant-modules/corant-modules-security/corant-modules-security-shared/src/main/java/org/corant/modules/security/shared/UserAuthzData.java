@@ -13,6 +13,7 @@
  */
 package org.corant.modules.security.shared;
 
+import static org.corant.shared.util.Assertions.shouldNotEmpty;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
@@ -74,6 +75,7 @@ public class UserAuthzData extends SimpleAuthzData {
 
   public static UserAuthzData ofPermissions(Serializable userId,
       Map<String, ? extends Serializable> attributes, String... permissions) {
+    shouldNotEmpty(permissions, "Permissions can't empty");
     return ofPermissions(userId,
         Arrays.stream(permissions).map(SimplePermission::of).collect(Collectors.toSet()),
         attributes);
@@ -94,6 +96,7 @@ public class UserAuthzData extends SimpleAuthzData {
 
   public static UserAuthzData ofRoles(Serializable userId,
       Map<String, ? extends Serializable> attributes, String... roles) {
+    shouldNotEmpty(roles, "Roles can't empty");
     return ofRoles(userId, Arrays.stream(roles).map(SimpleRole::of).collect(Collectors.toSet()),
         attributes);
   }

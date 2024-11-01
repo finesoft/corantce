@@ -17,6 +17,7 @@ import static org.corant.shared.normal.Names.NAME_SPACE_SEPARATOR;
 import static org.corant.shared.normal.Names.NAME_SPACE_SEPARATORS;
 import static org.corant.shared.normal.Names.ConfigNames.CFG_ADJUST_PREFIX;
 import static org.corant.shared.util.Assertions.shouldBeTrue;
+import static org.corant.shared.util.Empties.isNotEmpty;
 import static org.corant.shared.util.Maps.mapOf;
 import static org.corant.shared.util.Strings.aggregate;
 import static org.corant.shared.util.Strings.defaultString;
@@ -59,10 +60,12 @@ public class CorantConfigResolver {
 
   public static String concatKey(String... keys) {
     StringBuilder concats = new StringBuilder();
-    for (String key : keys) {
-      String useKey = defaultString(key);
-      if (!useKey.isBlank()) {
-        concats.append(removeSplitor(key)).append(KEY_DELIMITER);
+    if (isNotEmpty(keys)) {
+      for (String key : keys) {
+        String useKey = defaultString(key);
+        if (!useKey.isBlank()) {
+          concats.append(removeSplitor(key)).append(KEY_DELIMITER);
+        }
       }
     }
     return removeSplitor(concats.toString());

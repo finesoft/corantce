@@ -180,7 +180,7 @@ public class ResteasyResource extends AbstractJaxrsResource {
      * @return the value lists
      */
     public List<Map<String, Object>> getFieldsMatrix(String... fieldNames) {
-      if (fieldNames.length > 0) {
+      if (isNotEmpty(fieldNames)) {
         Map<String, List<Object>> temp = new LinkedHashMap<>(fieldNames.length);
         List<Map<String, Object>> result = new ArrayList<>();
         for (String fieldName : fieldNames) {

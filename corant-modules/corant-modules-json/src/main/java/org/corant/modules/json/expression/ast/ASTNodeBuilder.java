@@ -13,6 +13,7 @@
  */
 package org.corant.modules.json.expression.ast;
 
+import static org.corant.shared.util.Empties.isNotEmpty;
 import org.corant.modules.json.expression.ast.ASTObjectNode.EntryNode;
 import org.corant.shared.ubiquity.Sortable;
 
@@ -27,8 +28,10 @@ public interface ASTNodeBuilder extends Sortable {
 
   default ASTArrayNode arrayNodeOf(ASTNode<?>... elements) {
     ASTArrayNode node = new ASTArrayNode();
-    for (ASTNode<?> element : elements) {
-      node.addChild(element);
+    if (isNotEmpty(elements)) {
+      for (ASTNode<?> element : elements) {
+        node.addChild(element);
+      }
     }
     return node;
   }

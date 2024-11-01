@@ -20,6 +20,7 @@ import static org.corant.modules.ddd.shared.model.PkgMsgCds.ERR_ENT_NON_FUD_ID;
 import static org.corant.shared.util.Assertions.shouldNotNull;
 import static org.corant.shared.util.Classes.getUserClass;
 import static org.corant.shared.util.Empties.isEmpty;
+import static org.corant.shared.util.Empties.isNotEmpty;
 import static org.corant.shared.util.Maps.mapOf;
 import static org.corant.shared.util.Strings.asDefaultString;
 import static org.corant.shared.util.Strings.isNotBlank;
@@ -84,7 +85,7 @@ public class Aggregates {
       JPARepository repo = resolveRepository(getUserClass(cls));
       X x = shouldNotNull(repo.get(cls, id), () -> new GeneralRuntimeException(ERR_ENT_NON_FUD_ID,
           getUserClass(cls).getSimpleName(), asDefaultString(id)));
-      if (properties.length > 0) {
+      if (isNotEmpty(properties)) {
         repo.lock(x, lockModeType, mapOf(properties));
       } else {
         repo.lock(x, lockModeType);
@@ -97,7 +98,7 @@ public class Aggregates {
   public static <X extends Aggregate> X lock(X aggregate, LockModeType lockModeType,
       Object... properties) {
     if (aggregate != null) {
-      if (properties.length > 0) {
+      if (isNotEmpty(properties)) {
         resolveRepository(getUserClass(aggregate)).lock(aggregate, lockModeType, mapOf(properties));
       } else {
         resolveRepository(getUserClass(aggregate)).lock(aggregate, lockModeType);
@@ -115,7 +116,7 @@ public class Aggregates {
   public static <X extends Aggregate> X resolve(Class<X> cls, Serializable id,
       LockModeType lockModeType, Object... properties) {
     if (id != null && cls != null) {
-      if (properties.length > 0) {
+      if (isNotEmpty(properties)) {
         return shouldNotNull(resolveRepository(cls).get(cls, id, lockModeType, mapOf(properties)),
             () -> new GeneralRuntimeException(ERR_ENT_NON_FUD_ID, cls.getSimpleName(),
                 asDefaultString(id)));
@@ -131,7 +132,7 @@ public class Aggregates {
   public static <X extends Aggregate> X resolve(Class<X> cls, Serializable id,
       Object... properties) {
     if (id != null && cls != null) {
-      if (properties.length > 0) {
+      if (isNotEmpty(properties)) {
         return shouldNotNull(resolveRepository(cls).get(cls, id, mapOf(properties)),
             () -> new GeneralRuntimeException(ERR_ENT_NON_FUD_ID, cls.getSimpleName(),
                 asDefaultString(id)));

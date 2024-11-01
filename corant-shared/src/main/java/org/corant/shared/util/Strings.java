@@ -836,7 +836,7 @@ public class Strings {
    */
   public static boolean matchAllRegex(final CharSequence seq, final int flags,
       final String... regex) {
-    if (seq == null || regex.length == 0) {
+    if (seq == null || isEmpty(regex)) {
       return false;
     } else {
       return streamOf(regex).map(ps -> Pattern.compile(ps, flags))
@@ -857,7 +857,7 @@ public class Strings {
    */
   public static boolean matchAnyRegex(final CharSequence seq, final int flags,
       final String... regex) {
-    if (seq == null || regex.length == 0) {
+    if (seq == null || isEmpty(regex)) {
       return false;
     } else {
       return streamOf(regex).map(ps -> Pattern.compile(ps, flags))

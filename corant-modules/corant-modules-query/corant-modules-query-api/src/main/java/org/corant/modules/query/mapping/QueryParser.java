@@ -14,6 +14,7 @@
 package org.corant.modules.query.mapping;
 
 import static java.lang.String.format;
+import static org.corant.shared.util.Empties.isNotEmpty;
 import static org.corant.shared.util.Sets.setOf;
 import static org.corant.shared.util.Strings.split;
 import java.io.IOException;
@@ -79,15 +80,17 @@ public class QueryParser {
 
   Map<String, Resource> getQueryMappingFiles(String... pathExpresses) {
     Map<String, Resource> map = new ConcurrentHashMap<>();
-    for (String pathExpress : pathExpresses) {
-      setOf(split(pathExpress, ",", true, true)).forEach(path -> {
-        try {
-          Resources.from(path).forEach(f -> map.put(f.getURL().getPath(), f));
-        } catch (Exception e) {
-          throw new QueryRuntimeException(e, "Can't resolve query mapping files from path %s.",
-              path);
-        }
-      });
+    if (isNotEmpty(pathExpresses)) {
+      for (String pathExpress : pathExpresses) {
+        setOf(split(pathExpress, ",", true, true)).forEach(path -> {
+          try {
+            Resources.from(path).forEach(f -> map.put(f.getURL().getPath(), f));
+          } catch (Exception e) {
+            throw new QueryRuntimeException(e, "Can't resolve query mapping files from path %s.",
+                path);
+          }
+        });
+      }
     }
     return map;
   }

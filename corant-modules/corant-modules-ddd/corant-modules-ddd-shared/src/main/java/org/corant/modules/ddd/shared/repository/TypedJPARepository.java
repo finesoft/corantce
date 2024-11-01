@@ -15,6 +15,7 @@ package org.corant.modules.ddd.shared.repository;
 
 import static org.corant.context.Beans.resolve;
 import static org.corant.context.Beans.selectParameterized;
+import static org.corant.shared.util.Empties.isEmpty;
 import static org.corant.shared.util.Objects.defaultObject;
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
@@ -55,7 +56,7 @@ public interface TypedJPARepository<T extends Entity>
    */
   static <T extends Entity> TypedJPARepository<T> instance(Class<T> entityClass,
       Annotation... qualifiers) {
-    if (qualifiers.length == 0) {
+    if (isEmpty(qualifiers)) {
       Instance<TypedJPARepository<T>> instance =
           selectParameterized(TypedJPARepository.class, entityClass);
       if (instance.isUnsatisfied()) {

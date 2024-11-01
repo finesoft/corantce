@@ -17,6 +17,7 @@ import static org.corant.shared.util.Assertions.shouldNotNull;
 import static org.corant.shared.util.Classes.getAllSuperclassesAndInterfaces;
 import static org.corant.shared.util.Classes.tryAsClass;
 import static org.corant.shared.util.Empties.isEmpty;
+import static org.corant.shared.util.Empties.isNotEmpty;
 import static org.corant.shared.util.Sets.setOf;
 import static org.corant.shared.util.Strings.defaultString;
 import static org.corant.shared.util.Strings.replace;
@@ -67,13 +68,15 @@ public class JPAUtils {
 
   public static Set<String> getPersistenceMappingFiles(String... pathExpressions) {
     Set<String> paths = new LinkedHashSet<>();
-    try {
-      for (String pathExpression : pathExpressions) {
-        Resources.fromClassPath(pathExpression).filter(r -> !(r instanceof ClassResource))
-            .map(ClassPathResource::getClassPath).forEach(paths::add);
+    if (isNotEmpty(pathExpressions)) {
+      try {
+        for (String pathExpression : pathExpressions) {
+          Resources.fromClassPath(pathExpression).filter(r -> !(r instanceof ClassResource))
+              .map(ClassPathResource::getClassPath).forEach(paths::add);
+        }
+      } catch (IOException e) {
+        throw new CorantRuntimeException(e);
       }
-    } catch (IOException e) {
-      throw new CorantRuntimeException(e);
     }
     return paths;
   }

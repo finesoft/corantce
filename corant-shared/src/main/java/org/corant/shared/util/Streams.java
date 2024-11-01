@@ -16,6 +16,7 @@ package org.corant.shared.util;
 import static org.corant.shared.normal.Defaults.FOUR_KBS;
 import static org.corant.shared.normal.Defaults.MAX_BUFFERED_BYTES;
 import static org.corant.shared.util.Assertions.shouldNotNull;
+import static org.corant.shared.util.Empties.isEmpty;
 import static org.corant.shared.util.Empties.isNotEmpty;
 import static org.corant.shared.util.Empties.sizeOf;
 import static org.corant.shared.util.Functions.emptyConsumer;
@@ -481,7 +482,7 @@ public class Streams {
    */
   @SuppressWarnings("unchecked")
   public static <T> Stream<T> streamOf(T... objects) {
-    return Arrays.stream(objects);
+    return isEmpty(objects) ? Stream.empty() : Arrays.stream(objects);
   }
 
   /**

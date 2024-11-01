@@ -15,6 +15,7 @@ package org.corant.modules.query.jpql;
 
 import static org.corant.modules.jpa.shared.JPQLHelper.getTotalQL;
 import static org.corant.shared.util.Empties.isEmpty;
+import static org.corant.shared.util.Empties.isNotEmpty;
 import static org.corant.shared.util.Maps.getMapBoolean;
 import static org.corant.shared.util.Maps.getMapEnum;
 import static org.corant.shared.util.Objects.defaultObject;
@@ -98,8 +99,10 @@ public abstract class AbstractJpqlNamedQueryService extends AbstractNamedQuerySe
       }
     }
     int counter = 1;
-    for (Object parameter : args) {
-      query.setParameter(counter++, parameter);
+    if (isNotEmpty(args)) {
+      for (Object parameter : args) {
+        query.setParameter(counter++, parameter);
+      }
     }
     handleQuery(query, cls, properties);
     return query;

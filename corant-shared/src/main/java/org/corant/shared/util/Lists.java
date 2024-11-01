@@ -15,13 +15,11 @@ package org.corant.shared.util;
 
 import static org.corant.shared.util.Assertions.shouldBeTrue;
 import static org.corant.shared.util.Conversions.toObject;
+import static org.corant.shared.util.Empties.isNotEmpty;
 import static org.corant.shared.util.Empties.sizeOf;
 import static org.corant.shared.util.Iterables.collectionOf;
-import static org.corant.shared.util.Objects.areEqual;
 import static org.corant.shared.util.Objects.forceCast;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -43,117 +41,6 @@ import org.corant.shared.ubiquity.Mutable.MutableInteger;
 public class Lists {
 
   private Lists() {}
-
-  /**
-   * <p>
-   * Appends all the elements of the given arrays into a new array.
-   * <p>
-   * The new array contains all of the element of {@code src} followed by all of the elements
-   * {@code ts}. When an array is returned, it is always a new array.
-   *
-   * @param <E> the element type
-   * @param src the first array whose elements are added to the new array
-   * @param ts the second array whose elements are added to the new array
-   * @return append
-   */
-  @SuppressWarnings("unchecked")
-  public static <E> E[] append(E[] src, E... ts) {
-    if (src == null && ts == null) {
-      return null;
-    } else if (ts != null && (src == null || src.length == 0)) {
-      return ts.clone();
-    } else if (src != null && (ts == null || ts.length == 0)) {
-      return src.clone();
-    }
-    final Class<?> st = src.getClass().getComponentType();
-    final E[] appendArray = (E[]) Array.newInstance(st, src.length + ts.length);
-    System.arraycopy(src, 0, appendArray, 0, src.length);
-    try {
-      System.arraycopy(ts, 0, appendArray, src.length, ts.length);
-    } catch (ArrayStoreException e) {
-      Class<?> tt = ts.getClass().getComponentType();
-      if (!st.isAssignableFrom(tt)) {
-        throw new IllegalArgumentException(
-            "Cannot append " + tt.getName() + " in an array of " + st.getName(), e);
-      }
-      throw e;
-    }
-    return appendArray;
-  }
-
-  /**
-   * <p>
-   * Appends all the elements of the given arrays which the given source array not contains into a
-   * new array.
-   * <p>
-   * The new array contains all of the element of {@code src} followed by all of the {@code ts}
-   * elements that not contains in the {@code src}. When an array is returned, it is always a new
-   * array.
-   *
-   * @param <E> the element type
-   * @param src the first array whose elements are added to the new array
-   * @param ts the second array whose elements are added to the new array
-   * @return append
-   */
-  @SuppressWarnings("unchecked")
-  public static <E> E[] appendIfAbsent(E[] src, E... ts) {
-    if (src == null && ts == null) {
-      return null;
-    } else if (ts != null && (src == null || src.length == 0)) {
-      return ts.clone();
-    } else if (src != null && (ts == null || ts.length == 0)) {
-      return src.clone();
-    }
-    final Class<?> st = src.getClass().getComponentType();
-    final E[] appendArray = (E[]) Array.newInstance(st, src.length + ts.length);
-    System.arraycopy(src, 0, appendArray, 0, src.length);
-    int length = src.length;
-    try {
-      for (E e : ts) {
-        boolean contains = false;
-        for (E s : appendArray) {
-          if (areEqual(e, s)) {
-            contains = true;
-            break;
-          }
-        }
-        if (!contains) {
-          appendArray[length] = e;
-          length++;
-        }
-      }
-    } catch (ArrayStoreException e) {
-      Class<?> tt = ts.getClass().getComponentType();
-      if (!st.isAssignableFrom(tt)) {
-        throw new IllegalArgumentException(
-            "Cannot append " + tt.getName() + " in an array of " + st.getName(), e);
-      }
-      throw e;
-    }
-    return Arrays.copyOf(appendArray, length);
-  }
-
-  /**
-   * Expand the {@link Arrays#copyOfRange(Object[], int, int)}, add convenient reverse index
-   * support. When the given index>=0, the processing process is the same as
-   * {@link Arrays#copyOfRange(Object[], int, int)}, when the index<0, the reverse index is used.
-   *
-   * @param <E> the element type
-   * @param original the array from which a range is to be copied
-   * @param from the initial index of the range to be copied, inclusive
-   * @param to the final index of the range to be copied, exclusive.(This index may lie outside the
-   *        array.)
-   * @see Arrays#copyOfRange(Object[], int, int)
-   */
-  public static <E> E[] copyOfRange(E[] original, int from, int to) {
-    if (original == null) {
-      return null;
-    }
-    int length = original.length;
-    int beginIndex = from < 0 ? length + from : from;
-    int endIndex = to < 0 ? length + to : to;
-    return Arrays.copyOfRange(original, beginIndex, endIndex);
-  }
 
   /**
    * Returns either the passed in list, or if the list is {@code null} or {@link List#isEmpty()} the
@@ -190,43 +77,6 @@ public class Lists {
       return s;
     } else {
       return new ArrayList<>(list);
-    }
-  }
-
-  /**
-   * Remove duplicate elements of the array and return a new array of unique elements sorted in the
-   * original order. Return null if the given {@code src} array is null, return an empty new array
-   * if the given {@code src} array is empty.
-   *
-   * @param <E> the element type
-   * @param src the original array
-   */
-  @SuppressWarnings("unchecked")
-  public static <E> E[] distinct(E[] src) {
-    if (src == null) {
-      return null;
-    } else {
-      final int len = src.length;
-      final E[] distinct = (E[]) Array.newInstance(src.getClass().getComponentType(), len);
-      if (len == 0) {
-        return distinct;
-      } else {
-        int index = 0;
-        for (int i = 0; i < len; i++) {
-          boolean contains = false;
-          for (int j = 0; j < i; j++) {
-            if (areEqual(src[i], src[j])) {
-              contains = true;
-              break;
-            }
-          }
-          if (!contains) {
-            distinct[index] = src[i];
-            index++;
-          }
-        }
-        return Arrays.copyOf(distinct, index);
-      }
     }
   }
 
@@ -414,34 +264,6 @@ public class Lists {
   }
 
   /**
-   * Null safe removeIf, execution begins only if the parameters passed in are not null.
-   *
-   * <p>
-   * This method returns a new array with the same elements of the input array except the element
-   * that pass predicate tests. The component type of the returned array is always the same as that
-   * of the input array.
-   *
-   * @param <E> the collection type
-   * @param src the array that elements will be removed
-   * @param predicate the predicate which returns true for elements to be removed
-   */
-  @SuppressWarnings("unchecked")
-  public static <E> E[] removeIf(E[] src, Predicate<? super E> predicate) {
-    if (src == null || predicate == null) {
-      return src;
-    }
-    final Class<?> st = src.getClass().getComponentType();
-    final E[] removedArray = (E[]) Array.newInstance(st, src.length);
-    int j = 0;
-    for (E element : src) {
-      if (!predicate.test(element)) {
-        removedArray[j++] = element;
-      }
-    }
-    return Arrays.copyOf(removedArray, j);
-  }
-
-  /**
    * Split a collection into sub-lists with size.
    *
    * @param <E> the element type
@@ -481,20 +303,6 @@ public class Lists {
   }
 
   /**
-   * Swaps the two specified elements in the specified array.
-   *
-   * @param <E> the element type
-   * @param a the array in which the elements at two positions will be swapped
-   * @param i the position index
-   * @param j the other position index
-   */
-  public static <E> void swap(E[] a, int i, int j) {
-    final E t = a[i];
-    a[i] = a[j];
-    a[j] = t;
-  }
-
-  /**
    * Swaps the elements at the specified positions in the specified list.(If the specified positions
    * are equal, invoking this method leaves the list unchanged.)
    *
@@ -530,9 +338,11 @@ public class Lists {
   @SafeVarargs
   public static <E> List<E> union(Collection<? extends E>... collections) {
     List<E> union = new ArrayList<>();
-    for (Collection<? extends E> collection : collections) {
-      if (collection != null) {
-        union.addAll(collection);
+    if (isNotEmpty(collections)) {
+      for (Collection<? extends E> collection : collections) {
+        if (collection != null) {
+          union.addAll(collection);
+        }
       }
     }
     return union;

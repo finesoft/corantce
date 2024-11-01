@@ -70,7 +70,7 @@ public class DefaultEntityManagerProvider implements EntityManagerProvider {
     if (!allowSpecializePersistenceContextBinding) {
       throw new NotSupportedException("Can't support specialize persistence context binding");
     }
-    if (ctx != null) {
+    if (ctx != null && entityClasses != null) {
       for (Class<?> cls : entityClasses) {
         if (cls != null) {
           specializePersistenceContexts.put(cls, ctx);
@@ -115,9 +115,11 @@ public class DefaultEntityManagerProvider implements EntityManagerProvider {
     if (!allowSpecializePersistenceContextBinding) {
       throw new NotSupportedException("Can't support specialize persistence context binding");
     }
-    for (Class<?> cls : entityClasses) {
-      if (cls != null) {
-        specializePersistenceContexts.remove(cls);
+    if (entityClasses != null) {
+      for (Class<?> cls : entityClasses) {
+        if (cls != null) {
+          specializePersistenceContexts.remove(cls);
+        }
       }
     }
   }

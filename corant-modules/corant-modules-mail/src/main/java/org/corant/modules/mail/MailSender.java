@@ -13,6 +13,7 @@
  */
 package org.corant.modules.mail;
 
+import static java.util.Collections.emptyList;
 import static org.corant.shared.util.Assertions.shouldNotNull;
 import java.util.Arrays;
 import java.util.Date;
@@ -88,7 +89,7 @@ public interface MailSender {
     @Override
     public void send(List<String> to, String subject, String text, Resource... resources) {
       this.send(new Mail().from(username).subject(subject).text(text).to(to)
-          .attachments(Arrays.asList(resources)));
+          .attachments(resources != null ? Arrays.asList(resources) : emptyList()));
     }
 
     @Override
@@ -115,12 +116,13 @@ public interface MailSender {
     @Override
     public void send(String to, String subject, String text, Resource... resources) {
       this.send(new Mail().from(username).subject(subject).text(text).to(to)
-          .attachments(Arrays.asList(resources)));
+          .attachments(resources != null ? Arrays.asList(resources) : emptyList()));
     }
 
     @Override
     public void send(String to, String cc, String subject, String text, Resource... resources) {
-      this.send(new Mail().from(username).subject(subject).text(text).to(to).cc(cc));
+      this.send(new Mail().from(username).subject(subject).text(text)
+          .attachments(resources != null ? Arrays.asList(resources) : emptyList()).to(to).cc(cc));
     }
 
     protected Session getSession() {

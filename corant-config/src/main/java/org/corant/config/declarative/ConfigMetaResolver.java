@@ -40,8 +40,8 @@ import org.corant.config.declarative.ConfigInjector.InjectStrategy;
 import org.corant.config.declarative.ConfigKeyItem.ConfigKeyItemLiteral;
 import org.corant.config.declarative.ConfigKeyRoot.ConfigKeyRootLiteral;
 import org.corant.shared.ubiquity.PropertyAccessor;
-import org.corant.shared.ubiquity.Tuple;
 import org.corant.shared.ubiquity.PropertyAccessor.PropertyMetadata;
+import org.corant.shared.ubiquity.Tuple;
 import org.corant.shared.ubiquity.Tuple.Pair;
 import org.eclipse.microprofile.config.inject.ConfigProperties;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
@@ -104,8 +104,8 @@ public class ConfigMetaResolver {
             || (pm.getReadMethod() != null
                 && pm.getReadMethod().getAnnotation(ConfigKeyItem.class) != null)
             || pm.getWriteMethod().getAnnotation(ConfigKeyItem.class) != null) {
-          configClass.addMethod(extractedDeclarativeMethod(klass, root, configClass,
-              pm.getName(), pm.getReadMethod(), pm.getWriteMethod()));
+          configClass.addMethod(extractedDeclarativeMethod(klass, root, configClass, pm.getName(),
+              pm.getReadMethod(), pm.getWriteMethod()));
         }
       }
     }
@@ -143,12 +143,11 @@ public class ConfigMetaResolver {
     String keyItem = Configs.getValue(keyItemCfgKey, String.class);
     String defaultValue = Configs.getValue(dfltValCfgKey, String.class);
     DeclarativePattern pattern = Configs.getValue(ptnCfgKey, DeclarativePattern.class);
-    ConfigKeyItem annotation;
     for (AnnotatedElement element : elements) {
       if (element == null) {
         continue;
       }
-      annotation = element.getAnnotation(ConfigKeyItem.class);
+      ConfigKeyItem annotation = element.getAnnotation(ConfigKeyItem.class);
       if (annotation != null) {
         if (keyItem == null) {
           keyItem = annotation.name();

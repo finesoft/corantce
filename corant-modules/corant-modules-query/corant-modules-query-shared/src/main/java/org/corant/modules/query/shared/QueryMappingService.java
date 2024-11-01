@@ -342,8 +342,10 @@ public class QueryMappingService {
 
   protected Set<String> resolvePaths(String... paths) {
     Set<String> resolved = new LinkedHashSet<>();
-    for (String path : paths) {
-      Collections.addAll(resolved, split(path, ",", true, true));
+    if (isNotEmpty(paths)) {
+      for (String path : paths) {
+        Collections.addAll(resolved, split(path, ",", true, true));
+      }
     }
     return resolved;
   }

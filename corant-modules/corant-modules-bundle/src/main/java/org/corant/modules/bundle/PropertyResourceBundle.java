@@ -14,6 +14,7 @@
 package org.corant.modules.bundle;
 
 import static java.lang.String.format;
+import static org.corant.shared.util.Empties.isEmpty;
 import static org.corant.shared.util.Empties.isNotEmpty;
 import static org.corant.shared.util.Functions.defaultBiPredicate;
 import static org.corant.shared.util.Functions.emptyBiPredicate;
@@ -177,6 +178,9 @@ public class PropertyResourceBundle extends ResourceBundle implements Sortable {
    */
   public static Map<Locale, PropertyResourceBundle> getFoldedLocaleBundles(
       BiPredicate<String, String> fs, String... paths) {
+    if (isEmpty(paths)) {
+      return new HashMap<>();
+    }
     return foldedLocaleBundles(Arrays.stream(paths).filter(Strings::isNotBlank)
         .flatMap(pkg -> getBundles(pkg, fs).stream()).collect(Collectors.toList()));
   }

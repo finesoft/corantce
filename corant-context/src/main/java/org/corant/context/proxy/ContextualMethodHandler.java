@@ -29,6 +29,7 @@ import java.util.Set;
 import java.util.function.Predicate;
 import org.corant.context.Beans;
 import org.corant.shared.util.Methods.MethodSignature;
+import org.jboss.weld.util.Annotations;
 
 /**
  * corant-context
@@ -57,7 +58,7 @@ public class ContextualMethodHandler implements Serializable {
     method = shouldNotNull(beanMethod);
     methodSignature = MethodSignature.of(method);
     clazz = defaultObject(beanClass, beanMethod::getDeclaringClass);
-    this.qualifiers = qualifiers;
+    this.qualifiers = qualifiers == null ? Annotations.EMPTY_ANNOTATIONS : qualifiers;
   }
 
   public static Set<ContextualMethodHandler> from(Class<?> clazz, Predicate<Method> methodPredicate,

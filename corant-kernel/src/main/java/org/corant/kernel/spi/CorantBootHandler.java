@@ -13,12 +13,13 @@
  */
 package org.corant.kernel.spi;
 
+import static org.corant.shared.util.Empties.isEmpty;
 import java.util.stream.Stream;
 import org.corant.Corant;
 import org.corant.kernel.event.PostContainerReadyEvent;
 import org.corant.kernel.event.PostCorantReadyEvent;
 import org.corant.shared.ubiquity.Sortable;
-import org.corant.shared.util.Iterables;
+import org.corant.shared.util.Objects;
 import org.corant.shared.util.Services;
 
 /**
@@ -45,11 +46,11 @@ public interface CorantBootHandler extends Sortable {
    * @see Services#selectRequired(Class, ClassLoader)
    */
   static Stream<CorantBootHandler> load(ClassLoader classLoader, String... excludeClassNames) {
-    if (excludeClassNames.length == 0) {
+    if (isEmpty(excludeClassNames)) {
       return Services.selectRequired(CorantBootHandler.class, classLoader);
     } else {
       return Services.selectRequired(CorantBootHandler.class, classLoader)
-          .filter(h -> Iterables.search(excludeClassNames, h.getClass().getName()) == -1);
+          .filter(h -> Objects.indexOf(excludeClassNames, h.getClass().getName()) == -1);
     }
   }
 
@@ -76,8 +77,8 @@ public interface CorantBootHandler extends Sortable {
    *
    * <p>
    * Note: If this method throws an exception, and if there are multiple Handlers, this method of
-   * the lower priority Handler will not be invoked. In some cases if one use daemon thread to shut down
-   * Corant this method may not be invoked.
+   * the lower priority Handler will not be invoked. In some cases if one use daemon thread to shut
+   * down Corant this method may not be invoked.
    *
    * @param classLoader the class loader use for this application
    * @param args the application startup arguments, the implementer can perform corresponding
@@ -92,8 +93,8 @@ public interface CorantBootHandler extends Sortable {
    * <p>
    * Note: If the application startup with {@link Corant#DISABLE_BEFORE_START_HANDLER_CMD} argument,
    * this method will not be invoked. If this method throws an exception, the container may not
-   * start up, and if there are multiple Handlers, this method of the lower priority Handler will not
-   * be invoked.
+   * start up, and if there are multiple Handlers, this method of the lower priority Handler will
+   * not be invoked.
    *
    * @param classLoader the class loader use for this application
    * @param args the application startup arguments, the implementer can perform corresponding

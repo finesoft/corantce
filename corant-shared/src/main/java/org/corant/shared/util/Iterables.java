@@ -14,6 +14,7 @@
 package org.corant.shared.util;
 
 import static org.corant.shared.util.Assertions.shouldNotNull;
+import static org.corant.shared.util.Empties.isEmpty;
 import static org.corant.shared.util.Objects.areEqual;
 import static org.corant.shared.util.Objects.defaultObject;
 import static org.corant.shared.util.Objects.forceCast;
@@ -108,7 +109,7 @@ public class Iterables {
    */
   @SafeVarargs
   public static <E> Iterable<E> concat(final Iterable<? extends E>... inputs) {
-    shouldNotNull(inputs);
+    shouldNotNull(inputs, "Iterables to concat can't null");
     return new Iterable<>() {
       final Iterable<? extends E>[] iterables = Arrays.copyOf(inputs, inputs.length);
 
@@ -130,7 +131,7 @@ public class Iterables {
    */
   @SafeVarargs
   public static <E> Iterator<E> concat(final Iterator<? extends E>... inputs) {
-    shouldNotNull(inputs);
+    shouldNotNull(inputs, "Iterators to concat can't null");
     return new Iterator<>() {
       @SuppressWarnings("unchecked")
       final Iterator<E>[] iterators =
@@ -173,17 +174,6 @@ public class Iterables {
       }
     }
     return false;
-  }
-
-  /**
-   * Returns true if the given array is not null and contains the given element otherwise false.
-   *
-   * @param <T> the element type
-   * @param array the array to check
-   * @param element the element to check
-   */
-  public static <T> boolean contains(T[] array, T element) {
-    return search(array, element) != -1;
   }
 
   /**
@@ -343,6 +333,9 @@ public class Iterables {
    */
   @SafeVarargs
   public static <E> Iterable<E> iterableOf(final E... objects) {
+    if (isEmpty(objects)) {
+      return emptyIterable();
+    }
     return new Iterable<>() {
       final E[] array = objects;
       final int size = array.length;
@@ -419,27 +412,6 @@ public class Iterables {
       array[x] = i;
     }
     return array;
-  }
-
-  /**
-   * Searches the specified array for the specified value, returns index of the search key, if it is
-   * contained in the array; otherwise, return -1.
-   *
-   * @param <T> the array component type
-   * @param a the array to be searched
-   * @param key the value to be searched for
-   * @return index of the search key, if it is contained in the array; otherwise, return -1.
-   */
-  public static <T> int search(T[] a, T key) {
-    if (a != null) {
-      int len = a.length;
-      for (int i = 0; i < len; i++) {
-        if (areEqual(a[i], key)) {
-          return i;
-        }
-      }
-    }
-    return -1;
   }
 
   /**

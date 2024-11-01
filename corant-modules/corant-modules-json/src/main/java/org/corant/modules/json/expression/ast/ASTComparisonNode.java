@@ -37,7 +37,7 @@ import java.util.Date;
 import java.util.regex.Pattern;
 import org.corant.modules.json.expression.EvaluationContext;
 import org.corant.shared.exception.NotSupportedException;
-import org.corant.shared.util.Iterables;
+import org.corant.shared.util.Objects;
 
 /**
  * corant-modules-json
@@ -246,7 +246,7 @@ public interface ASTComparisonNode extends ASTPredicateNode {
       } else if (right instanceof String rs && left instanceof String ls) {
         return rs.contains(ls);
       } else if (right instanceof Object[] array) {
-        return Iterables.search(array, right) != -1;
+        return Objects.indexOf(array, right) != -1;
       }
       return false;
     }
@@ -334,7 +334,7 @@ public interface ASTComparisonNode extends ASTPredicateNode {
       } else if (right instanceof String rs && left instanceof String ls) {
         return !rs.contains(ls);
       } else if (right instanceof Object[] array) {
-        return Iterables.search(array, right) == -1;
+        return Objects.indexOf(array, right) == -1;
       }
       return true;
     }

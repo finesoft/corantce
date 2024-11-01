@@ -40,7 +40,6 @@ import org.corant.shared.ubiquity.Mutable.MutableBoolean;
 import org.corant.shared.ubiquity.Mutable.MutableObject;
 import org.corant.shared.ubiquity.Tuple.Pair;
 import org.corant.shared.util.FileUtils;
-import org.corant.shared.util.Iterables;
 import org.corant.shared.util.Objects;
 import org.corant.shared.util.Strings;
 import org.eclipse.microprofile.config.Config;
@@ -127,7 +126,7 @@ public class CorantConfigSources {
     final ConfigAdjuster configAdjuster = ConfigAdjuster.resolve(classLoader);
     List<CorantConfigSource> sources = new ArrayList<>(originalSources.size());
     profileSources.forEach(ps -> {
-      if (ps.getLeft() == null || Iterables.search(profiles.get(), ps.getLeft()) != -1) {
+      if (ps.getLeft() == null || Objects.indexOf(profiles.get(), ps.getLeft()) != -1) {
         ConfigSource adjustedSource = configAdjuster.apply(ps.getRight());
         if (adjustedSource != null) {
           sources.add(new CorantConfigSource(adjustedSource, ps.getLeft()));

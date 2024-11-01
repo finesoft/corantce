@@ -50,7 +50,7 @@ public class SimpleRoles implements Iterable<SimpleRole>, Serializable {
   }
 
   public static SimpleRoles of(String... name) {
-    if (name.length == 0) {
+    if (Empties.isEmpty(name)) {
       return EMPTY_INST;
     }
     return new SimpleRoles(Arrays.stream(name).map(SimpleRole::new).collect(Collectors.toList()));

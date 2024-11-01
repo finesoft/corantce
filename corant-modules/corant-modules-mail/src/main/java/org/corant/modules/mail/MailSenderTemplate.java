@@ -14,6 +14,7 @@
 package org.corant.modules.mail;
 
 import static org.corant.shared.util.Assertions.shouldNotBlank;
+import static org.corant.shared.util.Assertions.shouldNotEmpty;
 import static org.corant.shared.util.Assertions.shouldNotNull;
 import static org.corant.shared.util.Maps.mapOf;
 import java.util.List;
@@ -90,6 +91,7 @@ public class MailSenderTemplate {
   }
 
   public void send(Mail... mails) {
+    shouldNotEmpty(mails);
     MailSender sender = resolveSender();
     for (Mail mail : mails) {
       if (mail.from() == null && username != null) {

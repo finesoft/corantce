@@ -23,6 +23,7 @@ import java.util.Locale;
 import jakarta.enterprise.util.AnnotationLiteral;
 import jakarta.enterprise.util.Nonbinding;
 import jakarta.inject.Qualifier;
+import org.corant.shared.util.Strings;
 
 /**
  * corant-modules-bundle
@@ -54,7 +55,7 @@ public @interface MessageKey {
     public MessageCodesLiteral(Locale locale, String key, String... parameters) {
       this.locale = locale;
       this.key = key;
-      this.parameters = parameters;
+      this.parameters = parameters == null ? Strings.EMPTY_ARRAY : parameters;
     }
 
     @Override

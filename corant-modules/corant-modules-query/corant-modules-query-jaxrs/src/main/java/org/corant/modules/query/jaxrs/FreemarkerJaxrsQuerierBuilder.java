@@ -101,11 +101,13 @@ public class FreemarkerJaxrsQuerierBuilder extends AbstractNamedQuerierBuilder<J
   }
 
   void checkVarNames(Environment e, String... varNames) throws TemplateModelException {
-    for (String varName : varNames) {
-      if (e.getKnownVariableNames().contains(varName)) {
-        throw new QueryRuntimeException(
-            "Freemarker dynamic querier buildr [%s] error, the key [%s] name conflict.",
-            query.getVersionedName(), varName);
+    if (isNotEmpty(varNames)) {
+      for (String varName : varNames) {
+        if (e.getKnownVariableNames().contains(varName)) {
+          throw new QueryRuntimeException(
+              "Freemarker dynamic querier buildr [%s] error, the key [%s] name conflict.",
+              query.getVersionedName(), varName);
+        }
       }
     }
   }

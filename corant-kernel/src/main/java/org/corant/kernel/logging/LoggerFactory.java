@@ -18,8 +18,8 @@ import static org.corant.shared.util.Classes.getUserClass;
 import static org.corant.shared.util.Classes.tryAsClass;
 import static org.corant.shared.util.Empties.isEmpty;
 import static org.corant.shared.util.Functions.emptyPredicate;
-import static org.corant.shared.util.Iterables.search;
 import static org.corant.shared.util.Methods.getMatchingMethod;
+import static org.corant.shared.util.Objects.indexOf;
 import static org.corant.shared.util.Objects.tryNewInstance;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -97,7 +97,7 @@ public class LoggerFactory {
     shouldNotNull(handler);
     Enumeration<String> names = LogManager.getLogManager().getLoggerNames();
     Predicate<String> filter =
-        isEmpty(loggerNames) ? emptyPredicate(true) : s -> search(loggerNames, s) != -1;
+        isEmpty(loggerNames) ? emptyPredicate(true) : s -> indexOf(loggerNames, s) != -1;
     if (names != null) {
       while (names.hasMoreElements()) {
         String name = names.nextElement();

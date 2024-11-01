@@ -15,6 +15,7 @@ package org.corant.modules.ddd.shared.unitwork;
 
 import static org.corant.shared.util.Assertions.shouldNotNull;
 import static org.corant.shared.util.Configurations.getConfigValue;
+import static org.corant.shared.util.Empties.isNotEmpty;
 import java.lang.annotation.Annotation;
 import java.util.concurrent.CompletionStage;
 import java.util.function.Consumer;
@@ -70,7 +71,7 @@ public class UnitOfWorks {
   }
 
   public void deregisterMessage(Message... messages) {
-    if (messages.length > 0) {
+    if (isNotEmpty(messages)) {
       AbstractJTAJPAUnitOfWork uow = currentDefaultUnitOfWork();
       for (Message message : messages) {
         uow.deregister(message);
@@ -135,7 +136,7 @@ public class UnitOfWorks {
   }
 
   public void registerMessage(Message... messages) {
-    if (messages.length > 0) {
+    if (isNotEmpty(messages)) {
       AbstractJTAJPAUnitOfWork uow = currentDefaultUnitOfWork();
       for (Message message : messages) {
         uow.register(message);

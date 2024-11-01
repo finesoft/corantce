@@ -48,6 +48,7 @@ import org.corant.modules.elastic.data.metadata.annotation.EsProperty;
 import org.corant.modules.elastic.data.metadata.annotation.EsRange;
 import org.corant.modules.elastic.data.metadata.annotation.EsText;
 import org.corant.modules.elastic.data.metadata.annotation.EsTokenCount;
+import org.corant.shared.ubiquity.Tuple.Pair;
 import org.corant.shared.util.Types;
 
 /**
@@ -318,18 +319,16 @@ public class ResolverUtils {
   }
 
   public static Type getCollectionFieldEleType(Field f, Class<?> contextRawType) {
-    return Types.canonicalize(Types.getCollectionElementType(f.getGenericType(), contextRawType));
+    return Types.getCollectionElementType(f.getGenericType(), contextRawType);
   }
 
-  public static Type[] getMapFieldKeyValTypes(Field f, Class<?> contextRawType) {
-    Type[] types = Types.getMapKeyAndValueTypes(f.getGenericType(), contextRawType);
+  public static Pair<Type, Type> getMapFieldKeyValTypes(Field f,
+      Class<? extends Map<?, ?>> contextRawType) {
+    Map<String, Type> types = Types.getMapKeyAndValueTypes(f.getGenericType(), contextRawType);
     if (!isEmpty(types)) {
-      Type[] result = new Type[types.length];
-      result[0] = Types.canonicalize(types[0]);
-      result[1] = Types.canonicalize(types[1]);
-      return result;
+      return Pair.of(types.get("K"), types.get("V"));
     }
-    return new Type[0];
+    return Pair.empty();
   }
 
   private static void resolveJoinMapping(ElasticMapping mapping,

@@ -13,6 +13,7 @@
  */
 package org.corant.shared.util;
 
+import static org.corant.shared.util.Empties.isNotEmpty;
 import static org.corant.shared.util.Lists.linkedListOf;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
@@ -48,32 +49,34 @@ public class Annotations {
   @SafeVarargs
   public static int calculateMembersHashCode(Pair<String, Object>... members) {
     int hashCode = 0;
-    for (Pair<String, Object> member : members) {
-      int memberNameHashCode = 127 * member.left().hashCode();
-      Object value = member.right();
-      int memberValueHashCode;
-      if (value instanceof boolean[]) {
-        memberValueHashCode = Arrays.hashCode((boolean[]) value);
-      } else if (value instanceof short[]) {
-        memberValueHashCode = Arrays.hashCode((short[]) value);
-      } else if (value instanceof int[]) {
-        memberValueHashCode = Arrays.hashCode((int[]) value);
-      } else if (value instanceof long[]) {
-        memberValueHashCode = Arrays.hashCode((long[]) value);
-      } else if (value instanceof float[]) {
-        memberValueHashCode = Arrays.hashCode((float[]) value);
-      } else if (value instanceof double[]) {
-        memberValueHashCode = Arrays.hashCode((double[]) value);
-      } else if (value instanceof byte[]) {
-        memberValueHashCode = Arrays.hashCode((byte[]) value);
-      } else if (value instanceof char[]) {
-        memberValueHashCode = Arrays.hashCode((char[]) value);
-      } else if (value instanceof Object[]) {
-        memberValueHashCode = Arrays.hashCode((Object[]) value);
-      } else {
-        memberValueHashCode = value.hashCode();
+    if (isNotEmpty(members)) {
+      for (Pair<String, Object> member : members) {
+        int memberNameHashCode = 127 * member.left().hashCode();
+        Object value = member.right();
+        int memberValueHashCode;
+        if (value instanceof boolean[]) {
+          memberValueHashCode = Arrays.hashCode((boolean[]) value);
+        } else if (value instanceof short[]) {
+          memberValueHashCode = Arrays.hashCode((short[]) value);
+        } else if (value instanceof int[]) {
+          memberValueHashCode = Arrays.hashCode((int[]) value);
+        } else if (value instanceof long[]) {
+          memberValueHashCode = Arrays.hashCode((long[]) value);
+        } else if (value instanceof float[]) {
+          memberValueHashCode = Arrays.hashCode((float[]) value);
+        } else if (value instanceof double[]) {
+          memberValueHashCode = Arrays.hashCode((double[]) value);
+        } else if (value instanceof byte[]) {
+          memberValueHashCode = Arrays.hashCode((byte[]) value);
+        } else if (value instanceof char[]) {
+          memberValueHashCode = Arrays.hashCode((char[]) value);
+        } else if (value instanceof Object[]) {
+          memberValueHashCode = Arrays.hashCode((Object[]) value);
+        } else {
+          memberValueHashCode = value.hashCode();
+        }
+        hashCode += memberNameHashCode ^ memberValueHashCode;
       }
-      hashCode += memberNameHashCode ^ memberValueHashCode;
     }
     return hashCode;
   }

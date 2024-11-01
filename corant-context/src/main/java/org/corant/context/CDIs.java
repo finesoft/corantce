@@ -14,6 +14,7 @@
 package org.corant.context;
 
 import static org.corant.shared.util.Assertions.shouldNotNull;
+import static org.corant.shared.util.Empties.isNotEmpty;
 import java.lang.annotation.Annotation;
 import java.util.List;
 import java.util.Set;
@@ -45,7 +46,7 @@ public abstract class CDIs {
 
   public static void fireEvent(Object event, Annotation... qualifiers) {
     shouldNotNull(event, "Fire event error, the event object can not null!");
-    if (qualifiers.length > 0) {
+    if (isNotEmpty(qualifiers)) {
       CDI.current().getBeanManager().getEvent().select(qualifiers).fire(event);
     } else {
       CDI.current().getBeanManager().getEvent().fire(event);

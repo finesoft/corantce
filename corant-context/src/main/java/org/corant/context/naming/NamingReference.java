@@ -40,7 +40,7 @@ public class NamingReference extends Reference {
   public NamingReference(Class<?> objectClass, Annotation... qualifiers) {
     super(objectClass.getName(), NamingObjectFactory.class.getName(), null);
     int length;
-    if ((length = qualifiers.length) > 0) {
+    if (qualifiers != null && (length = qualifiers.length) > 0) {
       this.qualifiers = new Annotation[length];
       System.arraycopy(qualifiers, 0, this.qualifiers, 0, length);
     }

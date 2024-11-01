@@ -22,6 +22,7 @@ import static org.corant.shared.util.Empties.sizeOf;
 import static org.corant.shared.util.Lists.listOf;
 import static org.corant.shared.util.Maps.getMapInteger;
 import static org.corant.shared.util.Maps.mapOf;
+import static org.corant.shared.util.Objects.EMPTY_ARRAY;
 import static org.corant.shared.util.Objects.asStrings;
 import static org.corant.shared.util.Objects.defaultObject;
 import static org.corant.shared.util.Objects.max;
@@ -306,8 +307,12 @@ public class SqlQueryTemplate {
   }
 
   public SqlQueryTemplate parameters(Object... parameters) {
-    ordinaryParameters = new Object[parameters.length];
-    System.arraycopy(parameters, 0, ordinaryParameters, 0, parameters.length);
+    if (isEmpty(parameters)) {
+      ordinaryParameters = EMPTY_ARRAY;
+    } else {
+      ordinaryParameters = new Object[parameters.length];
+      System.arraycopy(parameters, 0, ordinaryParameters, 0, parameters.length);
+    }
     useNamedParameter = false;
     return this;
   }

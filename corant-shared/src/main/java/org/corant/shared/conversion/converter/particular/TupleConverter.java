@@ -192,7 +192,7 @@ public class TupleConverter {
   private static Object[] convertTupleElements(Map<?, ?> values, Class<?>[] elementClasses,
       Map<String, ?> hints, String... keys) {
     int length = keys.length;
-    Object[] elements = new Object[keys.length];
+    Object[] elements = new Object[length];
     boolean accept = true;
     int len = elementClasses.length;
     for (int i = 0; i < length; i++) {

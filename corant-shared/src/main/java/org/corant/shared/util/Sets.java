@@ -287,9 +287,11 @@ public class Sets {
   @SafeVarargs
   public static <E> Set<E> union(Collection<? extends E>... collections) {
     Set<E> union = new LinkedHashSet<>();
-    for (Collection<? extends E> collection : collections) {
-      if (collection != null) {
-        union.addAll(collection);
+    if (collections != null) {
+      for (Collection<? extends E> collection : collections) {
+        if (collection != null) {
+          union.addAll(collection);
+        }
       }
     }
     return union;

@@ -145,7 +145,7 @@ public class SqlStatements {
    * @return a normalized SQL query statement and an ordered array of query parameters.
    */
   public static Pair<String, Object[]> normalize(String sql, Object... ordinaryParameters) {
-    if (isBlank(sql) || ordinaryParameters.length == 0
+    if (isBlank(sql) || isEmpty(ordinaryParameters)
         || streamOf(ordinaryParameters).noneMatch(Collection.class::isInstance)) {
       return Pair.of(sql, ordinaryParameters);
     }

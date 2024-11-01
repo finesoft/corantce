@@ -194,7 +194,7 @@ public class Configurations {
    * @return the matched raw stream
    */
   public static Stream<Pair<String, String>> searchConfigValues(String... keyOrWildcards) {
-    if (keyOrWildcards.length == 0) {
+    if (isEmpty(keyOrWildcards)) {
       return Stream.empty();
     }
     Predicate<String> predicate = s -> false;

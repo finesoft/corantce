@@ -193,7 +193,9 @@ public class SqlQueryDeveloperKits {
         });
 
     public FreemarkerQueryScriptValidator addSkipQueryQualifier(String... skipQueryQualifiers) {
-      Collections.addAll(skipQueryQualifier, skipQueryQualifiers);
+      if (isNotEmpty(skipQueryQualifiers)) {
+        Collections.addAll(skipQueryQualifier, skipQueryQualifiers);
+      }
       return this;
     }
 

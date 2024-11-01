@@ -50,7 +50,7 @@ public class SimplePermissions implements Iterable<SimplePermission>, Serializab
   }
 
   public static SimplePermissions of(String... name) {
-    if (name.length == 0) {
+    if (Empties.isEmpty(name)) {
       return EMPTY_INST;
     }
     return new SimplePermissions(

@@ -17,7 +17,7 @@ import static java.lang.annotation.ElementType.CONSTRUCTOR;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static org.corant.shared.util.Lists.appendIfAbsent;
+import static org.corant.shared.util.Objects.appendIfAbsent;
 import static org.corant.shared.util.Strings.EMPTY;
 import static org.corant.shared.util.Strings.EMPTY_ARRAY;
 import java.lang.annotation.Documented;

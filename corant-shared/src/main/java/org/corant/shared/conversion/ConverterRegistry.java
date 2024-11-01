@@ -14,14 +14,12 @@
 package org.corant.shared.conversion;
 
 import static org.corant.shared.util.Assertions.shouldBeTrue;
-import static org.corant.shared.util.Assertions.shouldNotNull;
 import static org.corant.shared.util.Classes.getUserClass;
 import static org.corant.shared.util.Empties.isNotEmpty;
 import static org.corant.shared.util.Maps.removeIfValue;
 import java.io.IOException;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +33,6 @@ import org.corant.shared.conversion.converter.AbstractConverter;
 import org.corant.shared.conversion.converter.factory.ObjectPrimitiveArrayConverterFactories;
 import org.corant.shared.resource.ClassResource;
 import org.corant.shared.ubiquity.Sortable;
-import org.corant.shared.util.Classes;
 import org.corant.shared.util.Resources;
 import org.corant.shared.util.Services;
 import org.corant.shared.util.Types;
@@ -180,8 +177,11 @@ public class ConverterRegistry {
    */
   public static synchronized <S, T> boolean register(Converter<S, T> converter) {
     if (converter != null) {
-      Class[] types = resolveTypes(converter);
-      return register(types[0], types[1], converter);
+      Map<String, Type> types =
+          Types.getTypeArgumentsDirectly(converter.getClass(), Converter.class);
+      shouldBeTrue(types.size() == 2, "The converter %s parameterized type must be actual type!",
+          converter.toString());
+      return register((Class) types.get("S"), (Class) types.get("T"), converter);
     }
     return false;
   }
@@ -312,36 +312,8 @@ public class ConverterRegistry {
     return false;
   }
 
-  static Class[] resolveTypes(Converter<?, ?> converter) {
-    Class[] classes = resolveClasses(
-        Types.getParameterizedTypes(getUserClass(shouldNotNull(converter)), Converter.class));
-    shouldBeTrue(classes.length == 2, "The converter %s parameterized type must be actual type!",
-        converter.toString());
-    return classes;
-  }
-
-  static Type[] resolveTypes(ConverterFactory<?, ?> converterFactory) {
-    Type[] types = Types.getParameterizedTypes(getUserClass(shouldNotNull(converterFactory)),
-        ConverterFactory.class);
-    shouldBeTrue(types.length == 2 && types[0] instanceof Class,
-        "The converter %s parameterized type must be actual type!", converterFactory.toString());
-    return types;
-  }
-
   private static void removeNotSupportType(ConverterType<?, ?> converterType) {
     NOT_SUPPORT_TYPES.removeIf(c -> c.match(converterType));
   }
 
-  private static Class[] resolveClasses(Type[] types) {
-    Class[] classes = new Class<?>[types.length];
-    int i = 0;
-    for (Type type : types) {
-      Class<?> typeClass = Classes.getClass(type);
-      if (typeClass != null) {
-        classes[i] = typeClass;
-        i++;
-      }
-    }
-    return Arrays.copyOf(classes, i);
-  }
 }

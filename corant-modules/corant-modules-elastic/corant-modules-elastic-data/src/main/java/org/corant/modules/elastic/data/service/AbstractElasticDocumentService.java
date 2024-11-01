@@ -16,6 +16,7 @@ package org.corant.modules.elastic.data.service;
 import static org.corant.shared.util.Assertions.shouldBeTrue;
 import static org.corant.shared.util.Assertions.shouldNotNull;
 import static org.corant.shared.util.Empties.isEmpty;
+import static org.corant.shared.util.Empties.isNotEmpty;
 import static org.corant.shared.util.Maps.getMapString;
 import static org.corant.shared.util.Objects.defaultObject;
 import static org.corant.shared.util.Objects.isNotNull;
@@ -172,7 +173,7 @@ public abstract class AbstractElasticDocumentService implements ElasticDocumentS
       if (isNotNull(sb)) {
         srb.addSort(sb);
       }
-      if (pops.length > 0) {
+      if (isNotEmpty(pops)) {
         srb.setFetchSource(pops, Strings.EMPTY_ARRAY);
       }
       return Arrays.stream(srb.get().getHits().getHits()).map(SearchHit::getSourceAsMap)

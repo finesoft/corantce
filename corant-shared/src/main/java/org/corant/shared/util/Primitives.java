@@ -21,6 +21,7 @@ import java.net.URL;
 import java.sql.Timestamp;
 import java.time.temporal.TemporalAccessor;
 import java.time.temporal.TemporalAmount;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Currency;
 import java.util.Date;
@@ -70,6 +71,271 @@ public class Primitives {
       Collections.unmodifiableMap(PRIMITIVE_WRAPPER_MAP.entrySet().stream()
           .collect(Collectors.toMap(Entry::getValue, Entry::getKey)));
 
+  public static boolean[] append(final boolean[] array, final boolean... elements) {
+    if (array == null) {
+      return elements == null ? EMPTY_BOOLEAN_ARRAY : elements.clone();
+    } else if (elements == null) {
+      return array.clone();
+    } else {
+      boolean[] ret = Arrays.copyOf(array, array.length + elements.length);
+      System.arraycopy(elements, 0, ret, array.length, elements.length);
+      return ret;
+    }
+  }
+
+  public static byte[] append(final byte[] array, final byte... elements) {
+    if (array == null) {
+      return elements == null ? EMPTY_BYTE_ARRAY : elements.clone();
+    } else if (elements == null) {
+      return array.clone();
+    } else {
+      byte[] ret = Arrays.copyOf(array, array.length + elements.length);
+      System.arraycopy(elements, 0, ret, array.length, elements.length);
+      return ret;
+    }
+  }
+
+  public static char[] append(final char[] array, final char... elements) {
+    if (array == null) {
+      return elements == null ? EMPTY_CHAR_ARRAY : elements.clone();
+    } else if (elements == null) {
+      return array.clone();
+    } else {
+      char[] ret = Arrays.copyOf(array, array.length + elements.length);
+      System.arraycopy(elements, 0, ret, array.length, elements.length);
+      return ret;
+    }
+  }
+
+  public static double[] append(final double[] array, final double... elements) {
+    if (array == null) {
+      return elements == null ? EMPTY_DOUBLE_ARRAY : elements.clone();
+    } else if (elements == null) {
+      return array.clone();
+    } else {
+      double[] ret = Arrays.copyOf(array, array.length + elements.length);
+      System.arraycopy(elements, 0, ret, array.length, elements.length);
+      return ret;
+    }
+  }
+
+  public static float[] append(final float[] array, final float... elements) {
+    if (array == null) {
+      return elements == null ? EMPTY_FLOAT_ARRAY : elements.clone();
+    } else if (elements == null) {
+      return array.clone();
+    } else {
+      float[] ret = Arrays.copyOf(array, array.length + elements.length);
+      System.arraycopy(elements, 0, ret, array.length, elements.length);
+      return ret;
+    }
+  }
+
+  public static int[] append(final int[] array, final int... elements) {
+    if (array == null) {
+      return elements == null ? EMPTY_INTEGER_ARRAY : elements.clone();
+    } else if (elements == null) {
+      return array.clone();
+    } else {
+      int[] ret = Arrays.copyOf(array, array.length + elements.length);
+      System.arraycopy(elements, 0, ret, array.length, elements.length);
+      return ret;
+    }
+  }
+
+  public static long[] append(final long[] array, final long... elements) {
+    if (array == null) {
+      return elements == null ? EMPTY_LONG_ARRAY : elements.clone();
+    } else if (elements == null) {
+      return array.clone();
+    } else {
+      long[] ret = Arrays.copyOf(array, array.length + elements.length);
+      System.arraycopy(elements, 0, ret, array.length, elements.length);
+      return ret;
+    }
+  }
+
+  public static short[] append(final short[] array, final short... elements) {
+    if (array == null) {
+      return elements == null ? EMPTY_SHORT_ARRAY : elements.clone();
+    } else if (elements == null) {
+      return array.clone();
+    } else {
+      short[] ret = Arrays.copyOf(array, array.length + elements.length);
+      System.arraycopy(elements, 0, ret, array.length, elements.length);
+      return ret;
+    }
+  }
+
+  public static boolean[] insertAt(final int index, final boolean[] array,
+      final boolean... values) {
+    if (array == null) {
+      return EMPTY_BOOLEAN_ARRAY;
+    }
+    if (values == null) {
+      return array.clone();
+    }
+    if (index < 0 || index > array.length) {
+      throw new IndexOutOfBoundsException("Index: " + index + ", Length: " + array.length);
+    }
+    final boolean[] ret = new boolean[array.length + values.length];
+    System.arraycopy(values, 0, ret, index, values.length);
+    if (index > 0) {
+      System.arraycopy(array, 0, ret, 0, index);
+    }
+    if (index < array.length) {
+      System.arraycopy(array, index, ret, index + values.length, array.length - index);
+    }
+    return ret;
+  }
+
+  public static byte[] insertAt(final int index, final byte[] array, final byte... values) {
+    if (array == null) {
+      return EMPTY_BYTE_ARRAY;
+    }
+    if (values == null) {
+      return array.clone();
+    }
+    if (index < 0 || index > array.length) {
+      throw new IndexOutOfBoundsException("Index: " + index + ", Length: " + array.length);
+    }
+    final byte[] ret = new byte[array.length + values.length];
+    System.arraycopy(values, 0, ret, index, values.length);
+    if (index > 0) {
+      System.arraycopy(array, 0, ret, 0, index);
+    }
+    if (index < array.length) {
+      System.arraycopy(array, index, ret, index + values.length, array.length - index);
+    }
+    return ret;
+  }
+
+  public static char[] insertAt(final int index, final char[] array, final char... values) {
+    if (array == null) {
+      return EMPTY_CHAR_ARRAY;
+    }
+    if (values == null) {
+      return array.clone();
+    }
+    if (index < 0 || index > array.length) {
+      throw new IndexOutOfBoundsException("Index: " + index + ", Length: " + array.length);
+    }
+    final char[] ret = new char[array.length + values.length];
+    System.arraycopy(values, 0, ret, index, values.length);
+    if (index > 0) {
+      System.arraycopy(array, 0, ret, 0, index);
+    }
+    if (index < array.length) {
+      System.arraycopy(array, index, ret, index + values.length, array.length - index);
+    }
+    return ret;
+  }
+
+  public static double[] insertAt(final int index, final double[] array, final double... values) {
+    if (array == null) {
+      return EMPTY_DOUBLE_ARRAY;
+    }
+    if (values == null) {
+      return array.clone();
+    }
+    if (index < 0 || index > array.length) {
+      throw new IndexOutOfBoundsException("Index: " + index + ", Length: " + array.length);
+    }
+    final double[] ret = new double[array.length + values.length];
+    System.arraycopy(values, 0, ret, index, values.length);
+    if (index > 0) {
+      System.arraycopy(array, 0, ret, 0, index);
+    }
+    if (index < array.length) {
+      System.arraycopy(array, index, ret, index + values.length, array.length - index);
+    }
+    return ret;
+  }
+
+  public static float[] insertAt(final int index, final float[] array, final float... values) {
+    if (array == null) {
+      return EMPTY_FLOAT_ARRAY;
+    }
+    if (values == null) {
+      return array.clone();
+    }
+    if (index < 0 || index > array.length) {
+      throw new IndexOutOfBoundsException("Index: " + index + ", Length: " + array.length);
+    }
+    final float[] ret = new float[array.length + values.length];
+    System.arraycopy(values, 0, ret, index, values.length);
+    if (index > 0) {
+      System.arraycopy(array, 0, ret, 0, index);
+    }
+    if (index < array.length) {
+      System.arraycopy(array, index, ret, index + values.length, array.length - index);
+    }
+    return ret;
+  }
+
+  public static int[] insertAt(final int index, final int[] array, final int... values) {
+    if (array == null) {
+      return EMPTY_INTEGER_ARRAY;
+    }
+    if (values == null) {
+      return array.clone();
+    }
+    if (index < 0 || index > array.length) {
+      throw new IndexOutOfBoundsException("Index: " + index + ", Length: " + array.length);
+    }
+    final int[] ret = new int[array.length + values.length];
+    System.arraycopy(values, 0, ret, index, values.length);
+    if (index > 0) {
+      System.arraycopy(array, 0, ret, 0, index);
+    }
+    if (index < array.length) {
+      System.arraycopy(array, index, ret, index + values.length, array.length - index);
+    }
+    return ret;
+  }
+
+  public static long[] insertAt(final int index, final long[] array, final long... values) {
+    if (array == null) {
+      return EMPTY_LONG_ARRAY;
+    }
+    if (values == null) {
+      return array.clone();
+    }
+    if (index < 0 || index > array.length) {
+      throw new IndexOutOfBoundsException("Index: " + index + ", Length: " + array.length);
+    }
+    final long[] ret = new long[array.length + values.length];
+    System.arraycopy(values, 0, ret, index, values.length);
+    if (index > 0) {
+      System.arraycopy(array, 0, ret, 0, index);
+    }
+    if (index < array.length) {
+      System.arraycopy(array, index, ret, index + values.length, array.length - index);
+    }
+    return ret;
+  }
+
+  public static short[] insertAt(final int index, final short[] array, final short... values) {
+    if (array == null) {
+      return EMPTY_SHORT_ARRAY;
+    }
+    if (values == null) {
+      return array.clone();
+    }
+    if (index < 0 || index > array.length) {
+      throw new IndexOutOfBoundsException("Index: " + index + ", Length: " + array.length);
+    }
+    final short[] ret = new short[array.length + values.length];
+    System.arraycopy(values, 0, ret, index, values.length);
+    if (index > 0) {
+      System.arraycopy(array, 0, ret, 0, index);
+    }
+    if (index < array.length) {
+      System.arraycopy(array, index, ret, index + values.length, array.length - index);
+    }
+    return ret;
+  }
+
   public static boolean isPrimitiveArray(final Class<?> clazz) {
     return clazz.isArray() && clazz.getComponentType().isPrimitive();
   }
@@ -94,6 +360,396 @@ public class Primitives {
         || URI.class.isAssignableFrom(type) || TemporalAmount.class.isAssignableFrom(type)
         || Currency.class.isAssignableFrom(type) || Locale.class.isAssignableFrom(type)
         || TimeZone.class.isAssignableFrom(type);
+  }
+
+  public static byte[] removeAll(final byte[] array, final byte... elements) {
+    if (array == null || array.length == 0) {
+      return EMPTY_BYTE_ARRAY;
+    } else if (elements == null || elements.length == 0) {
+      return array.clone();
+    } else {
+      int length = array.length;
+      int newLength = 0;
+      byte[] ret = new byte[length];
+      for (byte b : array) {
+        boolean remove = false;
+        for (byte e : elements) {
+          if (b == e) {
+            remove = true;
+            break;
+          }
+        }
+        if (!remove) {
+          ret[newLength] = b;
+          newLength++;
+        }
+      }
+      return Arrays.copyOf(ret, newLength);
+    }
+  }
+
+  public static char[] removeAll(final char[] array, final char... elements) {
+    if (array == null || array.length == 0) {
+      return EMPTY_CHAR_ARRAY;
+    } else if (elements == null || elements.length == 0) {
+      return array.clone();
+    } else {
+      int length = array.length;
+      int newLength = 0;
+      char[] ret = new char[length];
+      for (char c : array) {
+        boolean remove = false;
+        for (char e : elements) {
+          if (c == e) {
+            remove = true;
+            break;
+          }
+        }
+        if (!remove) {
+          ret[newLength] = c;
+          newLength++;
+        }
+      }
+      return Arrays.copyOf(ret, newLength);
+    }
+  }
+
+  public static double[] removeAll(final double[] array, final double... elements) {
+    if (array == null || array.length == 0) {
+      return EMPTY_DOUBLE_ARRAY;
+    } else if (elements == null || elements.length == 0) {
+      return array.clone();
+    } else {
+      int length = array.length;
+      int newLength = 0;
+      double[] ret = new double[length];
+      for (double d : array) {
+        boolean remove = false;
+        for (double e : elements) {
+          if (d == e) {
+            remove = true;
+            break;
+          }
+        }
+        if (!remove) {
+          ret[newLength] = d;
+          newLength++;
+        }
+      }
+      return Arrays.copyOf(ret, newLength);
+    }
+  }
+
+  public static float[] removeAll(final float[] array, final float... elements) {
+    if (array == null || array.length == 0) {
+      return EMPTY_FLOAT_ARRAY;
+    } else if (elements == null || elements.length == 0) {
+      return array.clone();
+    } else {
+      int length = array.length;
+      int newLength = 0;
+      float[] ret = new float[length];
+      for (float f : array) {
+        boolean remove = false;
+        for (float e : elements) {
+          if (f == e) {
+            remove = true;
+            break;
+          }
+        }
+        if (!remove) {
+          ret[newLength] = f;
+          newLength++;
+        }
+      }
+      return Arrays.copyOf(ret, newLength);
+    }
+  }
+
+  public static int[] removeAll(final int[] array, final int... elements) {
+    if (array == null || array.length == 0) {
+      return EMPTY_INTEGER_ARRAY;
+    } else if (elements == null || elements.length == 0) {
+      return array.clone();
+    } else {
+      int length = array.length;
+      int newLength = 0;
+      int[] ret = new int[length];
+      for (int i : array) {
+        boolean remove = false;
+        for (int e : elements) {
+          if (i == e) {
+            remove = true;
+            break;
+          }
+        }
+        if (!remove) {
+          ret[newLength] = i;
+          newLength++;
+        }
+      }
+      return Arrays.copyOf(ret, newLength);
+    }
+  }
+
+  public static long[] removeAll(final long[] array, final long... elements) {
+    if (array == null || array.length == 0) {
+      return EMPTY_LONG_ARRAY;
+    } else if (elements == null || elements.length == 0) {
+      return array.clone();
+    } else {
+      int length = array.length;
+      int newLength = 0;
+      long[] ret = new long[length];
+      for (long l : array) {
+        boolean remove = false;
+        for (long e : elements) {
+          if (l == e) {
+            remove = true;
+            break;
+          }
+        }
+        if (!remove) {
+          ret[newLength] = l;
+          newLength++;
+        }
+      }
+      return Arrays.copyOf(ret, newLength);
+    }
+  }
+
+  public static short[] removeAll(final short[] array, final short... elements) {
+    if (array == null || array.length == 0) {
+      return EMPTY_SHORT_ARRAY;
+    } else if (elements == null || elements.length == 0) {
+      return array.clone();
+    } else {
+      int length = array.length;
+      int newLength = 0;
+      short[] ret = new short[length];
+      for (short s : array) {
+        boolean remove = false;
+        for (short e : elements) {
+          if (s == e) {
+            remove = true;
+            break;
+          }
+        }
+        if (!remove) {
+          ret[newLength] = s;
+          newLength++;
+        }
+      }
+      return Arrays.copyOf(ret, newLength);
+    }
+  }
+
+  public static boolean[] removeAt(final boolean[] array, final int... indices) {
+    if (array == null || array.length == 0) {
+      return EMPTY_BOOLEAN_ARRAY;
+    } else if (indices == null || indices.length == 0) {
+      return array.clone();
+    } else {
+      int length = array.length;
+      boolean[] ret = new boolean[length];
+      int newLength = 0;
+      for (int i = 0; i < length; i++) {
+        boolean remove = false;
+        for (int index : indices) {
+          if (i == index) {
+            remove = true;
+            break;
+          }
+        }
+        if (!remove) {
+          ret[newLength] = array[i];
+          newLength++;
+        }
+      }
+      return Arrays.copyOf(ret, newLength);
+    }
+  }
+
+  public static byte[] removeAt(final byte[] array, final int... indices) {
+    if (array == null || array.length == 0) {
+      return EMPTY_BYTE_ARRAY;
+    } else if (indices == null || indices.length == 0) {
+      return array.clone();
+    } else {
+      int length = array.length;
+      byte[] ret = new byte[length];
+      int newLength = 0;
+      for (int i = 0; i < length; i++) {
+        boolean remove = false;
+        for (int index : indices) {
+          if (i == index) {
+            remove = true;
+            break;
+          }
+        }
+        if (!remove) {
+          ret[newLength] = array[i];
+          newLength++;
+        }
+      }
+      return Arrays.copyOf(ret, newLength);
+    }
+  }
+
+  public static char[] removeAt(final char[] array, final int... indices) {
+    if (array == null || array.length == 0) {
+      return EMPTY_CHAR_ARRAY;
+    } else if (indices == null || indices.length == 0) {
+      return array.clone();
+    } else {
+      int length = array.length;
+      char[] ret = new char[length];
+      int newLength = 0;
+      for (int i = 0; i < length; i++) {
+        boolean remove = false;
+        for (int index : indices) {
+          if (i == index) {
+            remove = true;
+            break;
+          }
+        }
+        if (!remove) {
+          ret[newLength] = array[i];
+          newLength++;
+        }
+      }
+      return Arrays.copyOf(ret, newLength);
+    }
+  }
+
+  public static double[] removeAt(final double[] array, final int... indices) {
+    if (array == null || array.length == 0) {
+      return EMPTY_DOUBLE_ARRAY;
+    } else if (indices == null || indices.length == 0) {
+      return array.clone();
+    } else {
+      int length = array.length;
+      double[] ret = new double[length];
+      int newLength = 0;
+      for (int i = 0; i < length; i++) {
+        boolean remove = false;
+        for (int index : indices) {
+          if (i == index) {
+            remove = true;
+            break;
+          }
+        }
+        if (!remove) {
+          ret[newLength] = array[i];
+          newLength++;
+        }
+      }
+      return Arrays.copyOf(ret, newLength);
+    }
+  }
+
+  public static float[] removeAt(final float[] array, final int... indices) {
+    if (array == null || array.length == 0) {
+      return EMPTY_FLOAT_ARRAY;
+    } else if (indices == null || indices.length == 0) {
+      return array.clone();
+    } else {
+      int length = array.length;
+      float[] ret = new float[length];
+      int newLength = 0;
+      for (int i = 0; i < length; i++) {
+        boolean remove = false;
+        for (int index : indices) {
+          if (i == index) {
+            remove = true;
+            break;
+          }
+        }
+        if (!remove) {
+          ret[newLength] = array[i];
+          newLength++;
+        }
+      }
+      return Arrays.copyOf(ret, newLength);
+    }
+  }
+
+  public static int[] removeAt(final int[] array, final int... indices) {
+    if (array == null || array.length == 0) {
+      return EMPTY_INTEGER_ARRAY;
+    } else if (indices == null || indices.length == 0) {
+      return array.clone();
+    } else {
+      int length = array.length;
+      int[] ret = new int[length];
+      int newLength = 0;
+      for (int i = 0; i < length; i++) {
+        boolean remove = false;
+        for (int index : indices) {
+          if (i == index) {
+            remove = true;
+            break;
+          }
+        }
+        if (!remove) {
+          ret[newLength] = array[i];
+          newLength++;
+        }
+      }
+      return Arrays.copyOf(ret, newLength);
+    }
+  }
+
+  public static long[] removeAt(final long[] array, final int... indices) {
+    if (array == null || array.length == 0) {
+      return EMPTY_LONG_ARRAY;
+    } else if (indices == null || indices.length == 0) {
+      return array.clone();
+    } else {
+      int length = array.length;
+      long[] ret = new long[length];
+      int newLength = 0;
+      for (int i = 0; i < length; i++) {
+        boolean remove = false;
+        for (int index : indices) {
+          if (i == index) {
+            remove = true;
+            break;
+          }
+        }
+        if (!remove) {
+          ret[newLength] = array[i];
+          newLength++;
+        }
+      }
+      return Arrays.copyOf(ret, newLength);
+    }
+  }
+
+  public static short[] removeAt(final short[] array, final int... indices) {
+    if (array == null || array.length == 0) {
+      return EMPTY_SHORT_ARRAY;
+    } else if (indices == null || indices.length == 0) {
+      return array.clone();
+    } else {
+      int length = array.length;
+      short[] ret = new short[length];
+      int newLength = 0;
+      for (int i = 0; i < length; i++) {
+        boolean remove = false;
+        for (int index : indices) {
+          if (i == index) {
+            remove = true;
+            break;
+          }
+        }
+        if (!remove) {
+          ret[newLength] = array[i];
+          newLength++;
+        }
+      }
+      return Arrays.copyOf(ret, newLength);
+    }
   }
 
   public static boolean[] unwrap(final Boolean[] array) {
@@ -383,5 +1039,153 @@ public class Primitives {
       }
     }
     throw new CorantRuntimeException("The given parameter must be an array!");
+  }
+
+  public boolean contains(final byte[] array, final byte element) {
+    return indexOf(array, element, 0) != -1;
+  }
+
+  public boolean contains(final char[] array, final char element) {
+    return indexOf(array, element, 0) != -1;
+  }
+
+  public boolean contains(final double[] array, final double element) {
+    return indexOf(array, element, 0) != -1;
+  }
+
+  public boolean contains(final float[] array, final float element) {
+    return indexOf(array, element, 0) != -1;
+  }
+
+  public boolean contains(final int[] array, final int element) {
+    return indexOf(array, element, 0) != -1;
+  }
+
+  public boolean contains(final long[] array, final long element) {
+    return indexOf(array, element, 0) != -1;
+  }
+
+  public boolean contains(final short[] array, final short element) {
+    return indexOf(array, element, 0) != -1;
+  }
+
+  public int indexOf(final boolean[] array, final boolean element, final int fromIndex) {
+    if (array != null) {
+      int length = array.length;
+      if (fromIndex < 0 || fromIndex > (length - 1)) {
+        throw new IndexOutOfBoundsException("Index: " + fromIndex + ", Length: " + length);
+      }
+      for (int i = fromIndex; i < length; i++) {
+        if (array[i] == element) {
+          return i;
+        }
+      }
+    }
+    return -1;
+  }
+
+  public int indexOf(final byte[] array, final byte element, final int fromIndex) {
+    if (array != null) {
+      int length = array.length;
+      if (fromIndex < 0 || fromIndex > (length - 1)) {
+        throw new IndexOutOfBoundsException("Index: " + fromIndex + ", Length: " + length);
+      }
+      for (int i = fromIndex; i < length; i++) {
+        if (array[i] == element) {
+          return i;
+        }
+      }
+    }
+    return -1;
+  }
+
+  public int indexOf(char[] array, char element, final int fromIndex) {
+    if (array != null) {
+      int length = array.length;
+      if (fromIndex < 0 || fromIndex > (length - 1)) {
+        throw new IndexOutOfBoundsException("Index: " + fromIndex + ", Length: " + length);
+      }
+      for (int i = fromIndex; i < length; i++) {
+        if (array[i] == element) {
+          return i;
+        }
+      }
+    }
+    return -1;
+  }
+
+  public int indexOf(final double[] array, final double element, final int fromIndex) {
+    if (array != null) {
+      int length = array.length;
+      if (fromIndex < 0 || fromIndex > (length - 1)) {
+        throw new IndexOutOfBoundsException("Index: " + fromIndex + ", Length: " + length);
+      }
+      for (int i = fromIndex; i < length; i++) {
+        if (array[i] == element) {
+          return i;
+        }
+      }
+    }
+    return -1;
+  }
+
+  public int indexOf(final float[] array, final float element, final int fromIndex) {
+    if (array != null) {
+      int length = array.length;
+      if (fromIndex < 0 || fromIndex > (length - 1)) {
+        throw new IndexOutOfBoundsException("Index: " + fromIndex + ", Length: " + length);
+      }
+      for (int i = fromIndex; i < length; i++) {
+        if (array[i] == element) {
+          return i;
+        }
+      }
+    }
+    return -1;
+  }
+
+  public int indexOf(final int[] array, final int element, final int fromIndex) {
+    if (array != null) {
+      int length = array.length;
+      if (fromIndex < 0 || fromIndex > (length - 1)) {
+        throw new IndexOutOfBoundsException("Index: " + fromIndex + ", Length: " + length);
+      }
+      for (int i = fromIndex; i < length; i++) {
+        if (array[i] == element) {
+          return i;
+        }
+      }
+    }
+    return -1;
+  }
+
+  public int indexOf(final long[] array, final long element, final int fromIndex) {
+    if (array != null) {
+      int length = array.length;
+      if (fromIndex < 0 || fromIndex > (length - 1)) {
+        throw new IndexOutOfBoundsException("Index: " + fromIndex + ", Length: " + length);
+      }
+      for (int i = fromIndex; i < length; i++) {
+        if (array[i] == element) {
+          return i;
+        }
+      }
+    }
+    return -1;
+  }
+
+  public int indexOf(final short[] array, final short element, final int fromIndex) {
+    if (array != null) {
+      int length = array.length;
+      if (fromIndex < 0 || fromIndex > (length - 1)) {
+        throw new IndexOutOfBoundsException("Index: " + fromIndex + ", Length: " + length);
+      }
+      for (int i = fromIndex; i < length; i++) {
+        if (array[i] == element) {
+          return i;
+        }
+      }
+    }
+    return -1;
   }
 }

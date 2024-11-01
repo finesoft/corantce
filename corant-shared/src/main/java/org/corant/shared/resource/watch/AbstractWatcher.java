@@ -14,6 +14,7 @@
 package org.corant.shared.resource.watch;
 
 import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
+import static org.corant.shared.util.Empties.isNotEmpty;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.WatchEvent;
@@ -52,9 +53,11 @@ public abstract class AbstractWatcher implements Watcher {
   @Override
   public boolean registerListener(FileChangeListener... listeners) {
     boolean registered = false;
-    for (FileChangeListener listener : listeners) {
-      if (listener != null) {
-        registered |= this.listeners.add(listener);
+    if (isNotEmpty(listeners)) {
+      for (FileChangeListener listener : listeners) {
+        if (listener != null) {
+          registered |= this.listeners.add(listener);
+        }
       }
     }
     return registered;

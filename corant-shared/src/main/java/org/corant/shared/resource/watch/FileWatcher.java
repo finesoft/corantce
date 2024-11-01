@@ -16,6 +16,7 @@ package org.corant.shared.resource.watch;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_DELETE;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 import static org.corant.shared.util.Assertions.shouldBeTrue;
+import static org.corant.shared.util.Empties.isNotEmpty;
 import java.io.File;
 import java.util.Collections;
 import java.util.concurrent.atomic.AtomicLong;
@@ -35,7 +36,9 @@ public class FileWatcher extends AbstractWatcher {
   public FileWatcher(File file, long pollingIntervalMs, FileChangeListener... listeners) {
     shouldBeTrue(file != null && file.isFile(), "The file to be watched must be a non null file.");
     this.pollingIntervalMs = pollingIntervalMs < 0 ? 64 : pollingIntervalMs;
-    Collections.addAll(this.listeners, listeners);
+    if (isNotEmpty(listeners)) {
+      Collections.addAll(this.listeners, listeners);
+    }
     this.file = file;
     modifiedTimeStamp = new AtomicLong(file.lastModified());
   }

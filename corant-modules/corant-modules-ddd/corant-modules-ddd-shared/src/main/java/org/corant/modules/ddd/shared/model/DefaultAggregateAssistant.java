@@ -16,6 +16,7 @@ package org.corant.modules.ddd.shared.model;
 import static java.lang.String.format;
 import static org.corant.context.Beans.resolve;
 import static org.corant.shared.util.Assertions.shouldNotNull;
+import static org.corant.shared.util.Empties.isEmpty;
 import static org.corant.shared.util.Preconditions.requireNotNull;
 import java.lang.annotation.Annotation;
 import java.util.LinkedList;
@@ -77,6 +78,9 @@ public class DefaultAggregateAssistant implements AggregateAssistant {
 
   @Override
   public void enqueueMessages(boolean anyway, Message... messages) {
+    if (isEmpty(messages)) {
+      return;
+    }
     if (aggregate.getId() == null || anyway) {
       UnitOfWork uow = currentUnitOfWork();
       if (uow != null) {

@@ -108,16 +108,20 @@ public class CorantConfigBuilder implements ConfigBuilder {
 
   @Override
   public ConfigBuilder withConverters(Converter<?>... converters) {
-    for (Converter<?> converter : converters) {
-      addConverter(converter);
+    if (isNotEmpty(converters)) {
+      for (Converter<?> converter : converters) {
+        addConverter(converter);
+      }
     }
     return this;
   }
 
   @Override
   public ConfigBuilder withSources(ConfigSource... sources) {
-    for (ConfigSource source : sources) {
-      addSource(source);
+    if (isNotEmpty(sources)) {
+      for (ConfigSource source : sources) {
+        addSource(source);
+      }
     }
     return this;
   }

@@ -137,7 +137,7 @@ public interface EsQueryExecutor {
       total = searchResponse.getHits() != null ? searchResponse.getHits().getTotalHits() : 0;
       if (total > 0) {
         Map<String, Object> result = XContentUtils.searchResponseToMap(searchResponse, hintKeys);
-        if (hintKeys.length == 1) {
+        if (hintKeys != null && hintKeys.length == 1) {
           List<Object> extracted =
               getMapKeyPathValues(result, split(hintKeys[0], ".", true, true), true);
           extracted.forEach(obj -> list.add(forceCast(obj)));

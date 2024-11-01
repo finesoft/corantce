@@ -14,6 +14,7 @@
 package org.corant.modules.security.shared;
 
 import static java.util.Collections.emptyList;
+import static org.corant.shared.util.Assertions.shouldNotEmpty;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
@@ -47,9 +48,10 @@ public class SimplePrincipals implements Iterable<SimplePrincipal>, Serializable
     return new SimplePrincipals(null);
   }
 
-  public static SimplePrincipals of(String... name) {
+  public static SimplePrincipals of(String... names) {
+    shouldNotEmpty(names, "Principal names can't empty");
     return new SimplePrincipals(
-        Arrays.stream(name).map(SimplePrincipal::new).collect(Collectors.toList()));
+        Arrays.stream(names).map(SimplePrincipal::new).collect(Collectors.toList()));
   }
 
   @Override

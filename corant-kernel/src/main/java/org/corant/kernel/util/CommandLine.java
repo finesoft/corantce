@@ -14,12 +14,12 @@
 package org.corant.kernel.util;
 
 import static org.corant.shared.util.Lists.listOf;
-import static org.corant.shared.util.Lists.removeIf;
+import static org.corant.shared.util.Objects.removeIf;
+import static org.corant.shared.util.Objects.indexOf;
 import static org.corant.shared.util.Strings.escapedSplit;
 import static org.corant.shared.util.Strings.replace;
 import static org.corant.shared.util.Strings.split;
 import java.util.Arrays;
-import org.corant.shared.util.Iterables;
 import org.corant.shared.util.Strings;
 
 /**
@@ -41,7 +41,7 @@ public class CommandLine {
 
   public CommandLine(String command, String... arguments) {
     this.command = command;
-    this.arguments = arguments;
+    this.arguments = arguments == null ? Strings.EMPTY_ARRAY : arguments;
   }
 
   public static CommandLine parse(String command, String... commandAndArguments) {
@@ -79,7 +79,7 @@ public class CommandLine {
   }
 
   public boolean hasArguments(String argument) {
-    return argument != null && Iterables.search(arguments, argument) != -1;
+    return argument != null && indexOf(arguments, argument) != -1;
   }
 
   @Override

@@ -17,6 +17,7 @@ import static io.smallrye.health.api.HealthType.LIVENESS;
 import static io.smallrye.health.api.HealthType.READINESS;
 import static io.smallrye.health.api.HealthType.STARTUP;
 import static io.smallrye.health.api.HealthType.WELLNESS;
+import static org.corant.shared.util.Empties.isNotEmpty;
 import static org.corant.shared.util.Maps.mapOf;
 import java.io.OutputStream;
 import java.time.Duration;
@@ -366,30 +367,31 @@ public class SmallRyeHealthReporter {
 
   private boolean additionalListsChanged(HealthType... types) {
     boolean needRecompute = false;
-    for (HealthType type : types) {
-      switch (type) {
-        case LIVENESS:
-          if (livenessHealthRegistry.checksChanged()) {
-            needRecompute = true;
-          }
-          break;
-        case READINESS:
-          if (readinessHealthRegistry.checksChanged()) {
-            needRecompute = true;
-          }
-          break;
-        case WELLNESS:
-          if (wellnessHealthRegistry.checksChanged()) {
-            needRecompute = true;
-          }
-          break;
-        case STARTUP:
-          if (startupHealthRegistry.checksChanged()) {
-            needRecompute = true;
-          }
+    if (isNotEmpty(types)) {
+      for (HealthType type : types) {
+        switch (type) {
+          case LIVENESS:
+            if (livenessHealthRegistry.checksChanged()) {
+              needRecompute = true;
+            }
+            break;
+          case READINESS:
+            if (readinessHealthRegistry.checksChanged()) {
+              needRecompute = true;
+            }
+            break;
+          case WELLNESS:
+            if (wellnessHealthRegistry.checksChanged()) {
+              needRecompute = true;
+            }
+            break;
+          case STARTUP:
+            if (startupHealthRegistry.checksChanged()) {
+              needRecompute = true;
+            }
+        }
       }
     }
-
     return needRecompute;
   }
 

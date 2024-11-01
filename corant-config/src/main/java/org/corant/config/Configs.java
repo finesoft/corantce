@@ -330,7 +330,7 @@ public class Configs {
    * @return the matched raw stream
    */
   public static Stream<String> searchValues(String... propertyNameOrWildcards) {
-    if (propertyNameOrWildcards.length == 0) {
+    if (isEmpty(propertyNameOrWildcards)) {
       return Stream.empty();
     }
     Predicate<String> predicate = s -> false;

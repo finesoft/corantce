@@ -20,6 +20,7 @@ import static java.nio.file.StandardWatchEventKinds.ENTRY_DELETE;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
 import static org.corant.shared.util.Assertions.shouldNotNull;
+import static org.corant.shared.util.Empties.isNotEmpty;
 import static org.corant.shared.util.Objects.defaultObject;
 import static org.corant.shared.util.Objects.forceCast;
 import static org.corant.shared.util.Throwables.asUncheckedException;
@@ -68,7 +69,9 @@ public class DirectoryWatcher extends AbstractWatcher {
       filter = defaultObject(pathFilter, p -> true);
       service = FileSystems.getDefault().newWatchService();
       keys = new HashMap<>();
-      Collections.addAll(this.listeners, listeners);
+      if (isNotEmpty(listeners)) {
+        Collections.addAll(this.listeners, listeners);
+      }
       if (path.toFile().isFile()) {
         this.recursive = true;
         path = path.getParent();

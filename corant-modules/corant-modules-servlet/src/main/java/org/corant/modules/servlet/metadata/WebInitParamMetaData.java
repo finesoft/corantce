@@ -15,6 +15,7 @@ package org.corant.modules.servlet.metadata;
 
 import static org.corant.shared.util.Assertions.shouldNotNull;
 import static org.corant.shared.util.Configurations.getAssembledConfigValue;
+import static org.corant.shared.util.Empties.isEmpty;
 import java.util.Arrays;
 import jakarta.servlet.annotation.WebInitParam;
 
@@ -24,6 +25,8 @@ import jakarta.servlet.annotation.WebInitParam;
  * @author bingo 上午10:14:43
  */
 public class WebInitParamMetaData {
+
+  public static final WebInitParamMetaData[] EMPTY_ARRAY = {};
 
   private String name;
   private String value;
@@ -47,6 +50,9 @@ public class WebInitParamMetaData {
   protected WebInitParamMetaData() {}
 
   public static WebInitParamMetaData[] of(WebInitParam... annos) {
+    if (isEmpty(annos)) {
+      return EMPTY_ARRAY;
+    }
     return Arrays.stream(annos).map(WebInitParamMetaData::new).toArray(WebInitParamMetaData[]::new);
   }
 

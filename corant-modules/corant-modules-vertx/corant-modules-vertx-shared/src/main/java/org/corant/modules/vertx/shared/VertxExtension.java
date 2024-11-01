@@ -15,6 +15,7 @@ package org.corant.modules.vertx.shared;
 import static java.lang.String.format;
 import static org.corant.shared.util.Assertions.shouldNotNull;
 import static org.corant.shared.util.Configurations.getAssembledConfigValue;
+import static org.corant.shared.util.Empties.isNotEmpty;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.Collections;
@@ -159,9 +160,9 @@ public class VertxExtension implements Extension {
             : DEFAULT_CONSUMER_REGISTRATION_TIMEOUT;
     try {
       if (!latch.await(timeout, TimeUnit.MILLISECONDS)) {
-        throw new IllegalStateException(format(
-            "Message consumers not registered within %s ms [registered: %s, total: %s]", timeout,
-            latch.getCount(), consumerAddresses.size()));
+        throw new IllegalStateException(
+            format("Message consumers not registered within %s ms [registered: %s, total: %s]",
+                timeout, latch.getCount(), consumerAddresses.size()));
       }
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
@@ -223,7 +224,9 @@ public class VertxExtension implements Extension {
 
   private Set<Type> getBeanTypes(Class<?> implClazz, Type... types) {
     Set<Type> beanTypes = new HashSet<>();
-    Collections.addAll(beanTypes, types);
+    if (isNotEmpty(types)) {
+      Collections.addAll(beanTypes, types);
+    }
     beanTypes.add(implClazz);
     // Add all the interfaces (and extended interfaces) implemented directly by the impl class
     beanTypes.addAll(Reflections.getInterfaceClosure(implClazz));

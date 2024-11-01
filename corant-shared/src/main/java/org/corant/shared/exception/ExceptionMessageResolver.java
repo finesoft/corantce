@@ -41,6 +41,7 @@ import org.corant.shared.ubiquity.Sortable;
 import org.corant.shared.ubiquity.Tuple.Pair;
 import org.corant.shared.util.Chars;
 import org.corant.shared.util.FileUtils;
+import org.corant.shared.util.Objects;
 import org.corant.shared.util.Resources;
 import org.corant.shared.util.Services;
 import org.corant.shared.util.Strings;
@@ -178,8 +179,9 @@ public interface ExceptionMessageResolver extends Sortable {
       final Locale loc = defaultObject(locale, Locale::getDefault);
       final MessageFormat mf = (MessageFormat) getMapObject(source.get().get(loc), key);
       if (mf != null) {
+        Object[] param = parameters == null ? Objects.EMPTY_ARRAY : parameters;
         synchronized (mf) {
-          return mf.format(parameters);
+          return mf.format(param);
         }
       }
       return null;

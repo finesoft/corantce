@@ -13,6 +13,7 @@
  */
 package org.corant.modules.javafx.cdi;
 
+import static org.corant.shared.util.Empties.isNotEmpty;
 import static org.corant.shared.util.Objects.defaultObject;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
@@ -202,8 +203,8 @@ public class FXMLLoaders {
      * <p>
      * Note: When the CDI bean scope is {@link jakarta.enterprise.context.Dependent}, in order to
      * prevent memory leaks, users need to call the
-     * {@link jakarta.enterprise.inject.spi.CDI#destroy(Object)} method themselves, or bind the method
-     * to the listener of the relevant control disposing.
+     * {@link jakarta.enterprise.inject.spi.CDI#destroy(Object)} method themselves, or bind the
+     * method to the listener of the relevant control disposing.
      *
      * @return a FXMLLoader
      */
@@ -248,9 +249,11 @@ public class FXMLLoaders {
      * {@link #autoInjection(boolean)} is false, this setting is invalid.
      */
     public FXMLLoaderBuilder controllerQualifiers(Annotation... controllerQualifiers) {
-      if (controllerQualifiers.length > 0) {
+      if (isNotEmpty(controllerQualifiers)) {
         this.controllerQualifiers =
             Arrays.copyOf(controllerQualifiers, controllerQualifiers.length);
+      } else {
+        this.controllerQualifiers = Annotations.EMPTY_ARRAY;
       }
       return this;
     }

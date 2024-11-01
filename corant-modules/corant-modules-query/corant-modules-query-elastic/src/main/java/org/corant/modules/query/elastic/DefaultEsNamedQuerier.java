@@ -14,7 +14,7 @@
 package org.corant.modules.query.elastic;
 
 import static org.corant.shared.util.Empties.isNotEmpty;
-import static org.corant.shared.util.Lists.append;
+import static org.corant.shared.util.Objects.append;
 import static org.corant.shared.util.Objects.forceCast;
 import static org.corant.shared.util.Objects.min;
 import static org.corant.shared.util.Strings.asDefaultString;

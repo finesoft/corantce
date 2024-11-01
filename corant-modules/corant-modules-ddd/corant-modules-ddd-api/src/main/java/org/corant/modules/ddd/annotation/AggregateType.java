@@ -20,6 +20,7 @@ import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.corant.shared.util.Annotations.calculateMembersHashCode;
 import static org.corant.shared.util.Classes.getUserClass;
+import static org.corant.shared.util.Empties.isEmpty;
 import static org.corant.shared.util.Objects.forceCast;
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
@@ -45,6 +46,8 @@ public @interface AggregateType {
 
   class AggregateTypeLiteral extends AnnotationLiteral<AggregateType> implements AggregateType {
 
+    public static final AggregateTypeLiteral[] EMPTY_ARRAY = {};
+
     private static final long serialVersionUID = -5552841006073177750L;
 
     private Class<? extends Aggregate> value;
@@ -56,6 +59,9 @@ public @interface AggregateType {
 
     @SuppressWarnings("unchecked")
     public static AggregateTypeLiteral[] from(Class<? extends Aggregate>... values) {
+      if (isEmpty(values)) {
+        return EMPTY_ARRAY;
+      }
       return Arrays.stream(values).map(AggregateTypeLiteral::of)
           .toArray(AggregateTypeLiteral[]::new);
     }

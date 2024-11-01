@@ -50,8 +50,8 @@ import org.corant.modules.query.shared.NamedQueryServiceManager;
 import org.corant.modules.query.shared.QueryMappingService;
 import org.corant.shared.normal.Names;
 import org.corant.shared.util.Configurations;
-import org.corant.shared.util.Iterables;
 import org.corant.shared.util.Methods;
+import org.corant.shared.util.Objects;
 
 /**
  * corant-modules-query-shared
@@ -136,7 +136,7 @@ public class DeclarativeQueryServiceDelegateBean extends AbstractBean<Object> {
     // TODO consider the bridge method "change" visibility of base class's methods ??
     if (!method.isDefault() && !method.isBridge() && !Modifier.isStatic(method.getModifiers())) {
       if (useDeclaredMethod) {
-        if (Iterables.search(proxyType.getDeclaredMethods(), method) >= 0) {
+        if (Objects.indexOf(proxyType.getDeclaredMethods(), method) >= 0) {
           return createExecution(method, queryTypeQualifier);
         }
       } else {

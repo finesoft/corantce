@@ -15,6 +15,7 @@ package org.corant.modules.jta.narayana.objectstore.driver;
 
 import static org.corant.shared.util.Assertions.shouldBeTrue;
 import static org.corant.shared.util.Assertions.shouldNotBlank;
+import static org.corant.shared.util.Empties.isEmpty;
 import static org.corant.shared.util.Strings.EMPTY;
 import java.io.IOException;
 import java.sql.Connection;
@@ -544,6 +545,9 @@ public abstract class AbstractDomainJDBCDriver
   }
 
   protected void release(AutoCloseable... closeables) {
+    if (isEmpty(closeables)) {
+      return;
+    }
     for (AutoCloseable closeable : closeables) {
       if (closeable != null) {
         try {
