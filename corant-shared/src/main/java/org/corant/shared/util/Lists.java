@@ -15,17 +15,20 @@ package org.corant.shared.util;
 
 import static org.corant.shared.util.Assertions.shouldBeTrue;
 import static org.corant.shared.util.Conversions.toObject;
+import static org.corant.shared.util.Empties.isEmpty;
 import static org.corant.shared.util.Empties.isNotEmpty;
 import static org.corant.shared.util.Empties.sizeOf;
 import static org.corant.shared.util.Iterables.collectionOf;
 import static org.corant.shared.util.Objects.forceCast;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -247,8 +250,33 @@ public class Lists {
     return initials == null ? new ArrayList<>() : new ArrayList<>(initials);
   }
 
+  public static <E> List<E> removeAt(final List<E> list, final int... indices) {
+    if (isNotEmpty(indices) && isNotEmpty(list)) {
+      int[] usedIndices = Primitives.distinct(indices);
+      Arrays.sort(usedIndices);
+      ListIterator<E> it = list.listIterator();
+      int ri = usedIndices[0];
+      int i = 0;
+      int j = 0;
+      while (it.hasNext()) {
+        it.next();
+        if (ri == i) {
+          it.remove();
+          if (++j < usedIndices.length) {
+            ri = usedIndices[j];
+          } else {
+            break;
+          }
+        }
+        i++;
+      }
+    }
+    return list;
+  }
+
   /**
-   * Null safe removeIf, execution begins only if the parameters passed in are not null.
+   * Null safe removeIf, execution begins only if the parameters passed in are not null. Returns the
+   * original given collection that elements have been removed.
    *
    * @param <C> the collection type
    * @param <E> the element type
@@ -261,6 +289,30 @@ public class Lists {
       collection.removeIf(p);
     }
     return collection;
+  }
+
+  public static <E> List<E> slice(final List<? extends E> list, final int start, final int end) {
+    return slice(list, start, end, 1);
+  }
+
+  public static <E> List<E> slice(final List<? extends E> list, final int start, final int end,
+      final int step) {
+    if (isEmpty(list)) {
+      return new ArrayList<>();
+    }
+    final int size = list.size();
+    final int useStart = start < 0 ? size + start : start;
+    final int useEnd = Math.min((end < 0 ? size + end : end), size);
+    final int sliceSize = useEnd - useStart;
+    if (sliceSize < 0 || useStart > (size - 1)) {
+      return new ArrayList<>();
+    }
+    final int useStep = Math.max(step, 1);
+    final List<E> sliceList = new ArrayList<>(sliceSize);
+    for (int i = useStart; i < useEnd; i += useStep) {
+      sliceList.add(list.get(i));
+    }
+    return sliceList;
   }
 
   /**

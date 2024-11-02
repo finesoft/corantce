@@ -167,6 +167,34 @@ public class Primitives {
     }
   }
 
+  public static int[] distinct(int[] array) {
+    if (array == null) {
+      return null;
+    } else {
+      final int len = array.length;
+      final int[] distinct = new int[len];
+      if (len == 0) {
+        return distinct;
+      } else {
+        int index = 0;
+        for (int i = 0; i < len; i++) {
+          boolean contains = false;
+          for (int j = 0; j < i; j++) {
+            if (array[i] == array[j]) {
+              contains = true;
+              break;
+            }
+          }
+          if (!contains) {
+            distinct[index] = array[i];
+            index++;
+          }
+        }
+        return Arrays.copyOf(distinct, index);
+      }
+    }
+  }
+
   public static boolean[] insertAt(final int index, final boolean[] array,
       final boolean... values) {
     if (array == null) {
@@ -750,6 +778,224 @@ public class Primitives {
       }
       return Arrays.copyOf(ret, newLength);
     }
+  }
+
+  public static boolean[] slice(final boolean[] array, final int start, final int end) {
+    return slice(array, start, end, 1);
+  }
+
+  public static boolean[] slice(final boolean[] array, final int start, final int end,
+      final int step) {
+    if (array == null || array.length == 0) {
+      return EMPTY_BOOLEAN_ARRAY;
+    }
+    final int length = array.length;
+    final int useStart = start < 0 ? length + start : start;
+    final int useEnd = Math.min((end < 0 ? length + end : end), length);
+    final int sliceLength = useEnd - useStart;
+    if (sliceLength < 0 || useStart > (length - 1)) {
+      return EMPTY_BOOLEAN_ARRAY;
+    }
+    final int useStep = Math.max(step, 1);
+    final boolean[] sliceArray = new boolean[sliceLength];
+    int j = 0;
+    for (int i = useStart; i < useEnd; i += useStep, j++) {
+      sliceArray[j] = array[i];
+    }
+    if (sliceLength - j == 1) {
+      return sliceArray;
+    }
+    return Arrays.copyOf(sliceArray, j);
+  }
+
+  public static byte[] slice(final byte[] array, final int start, final int end) {
+    return slice(array, start, end, 1);
+  }
+
+  public static byte[] slice(final byte[] array, final int start, final int end, final int step) {
+    if (array == null || array.length == 0) {
+      return EMPTY_BYTE_ARRAY;
+    }
+    final int length = array.length;
+    final int useStart = start < 0 ? length + start : start;
+    final int useEnd = Math.min((end < 0 ? length + end : end), length);
+    final int sliceLength = useEnd - useStart;
+    if (sliceLength < 0 || useStart > (length - 1)) {
+      return EMPTY_BYTE_ARRAY;
+    }
+    final int useStep = Math.max(step, 1);
+    final byte[] sliceArray = new byte[sliceLength];
+    int j = 0;
+    for (int i = useStart; i < useEnd; i += useStep, j++) {
+      sliceArray[j] = array[i];
+    }
+    if (sliceLength - j == 1) {
+      return sliceArray;
+    }
+    return Arrays.copyOf(sliceArray, j);
+  }
+
+  public static char[] slice(final char[] array, final int start, final int end) {
+    return slice(array, start, end, 1);
+  }
+
+  public static char[] slice(final char[] array, final int start, final int end, final int step) {
+    if (array == null || array.length == 0) {
+      return EMPTY_CHAR_ARRAY;
+    }
+    final int length = array.length;
+    final int useStart = start < 0 ? length + start : start;
+    final int useEnd = Math.min((end < 0 ? length + end : end), length);
+    final int sliceLength = useEnd - useStart;
+    if (sliceLength < 0 || useStart > (length - 1)) {
+      return EMPTY_CHAR_ARRAY;
+    }
+    final int useStep = Math.max(step, 1);
+    final char[] sliceArray = new char[sliceLength];
+    int j = 0;
+    for (int i = useStart; i < useEnd; i += useStep, j++) {
+      sliceArray[j] = array[i];
+    }
+    if (sliceLength - j == 1) {
+      return sliceArray;
+    }
+    return Arrays.copyOf(sliceArray, j);
+  }
+
+  public static double[] slice(final double[] array, final int start, final int end) {
+    return slice(array, start, end, 1);
+  }
+
+  public static double[] slice(final double[] array, final int start, final int end,
+      final int step) {
+    if (array == null || array.length == 0) {
+      return EMPTY_DOUBLE_ARRAY;
+    }
+    final int length = array.length;
+    final int useStart = start < 0 ? length + start : start;
+    final int useEnd = Math.min((end < 0 ? length + end : end), length);
+    final int sliceLength = useEnd - useStart;
+    if (sliceLength < 0 || useStart > (length - 1)) {
+      return EMPTY_DOUBLE_ARRAY;
+    }
+    final int useStep = Math.max(step, 1);
+    final double[] sliceArray = new double[sliceLength];
+    int j = 0;
+    for (int i = useStart; i < useEnd; i += useStep, j++) {
+      sliceArray[j] = array[i];
+    }
+    if (sliceLength - j == 1) {
+      return sliceArray;
+    }
+    return Arrays.copyOf(sliceArray, j);
+  }
+
+  public static float[] slice(final float[] array, final int start, final int end) {
+    return slice(array, start, end, 1);
+  }
+
+  public static float[] slice(final float[] array, final int start, final int end, final int step) {
+    if (array == null || array.length == 0) {
+      return EMPTY_FLOAT_ARRAY;
+    }
+    final int length = array.length;
+    final int useStart = start < 0 ? length + start : start;
+    final int useEnd = Math.min((end < 0 ? length + end : end), length);
+    final int sliceLength = useEnd - useStart;
+    if (sliceLength < 0 || useStart > (length - 1)) {
+      return EMPTY_FLOAT_ARRAY;
+    }
+    final int useStep = Math.max(step, 1);
+    final float[] sliceArray = new float[sliceLength];
+    int j = 0;
+    for (int i = useStart; i < useEnd; i += useStep, j++) {
+      sliceArray[j] = array[i];
+    }
+    if (sliceLength - j == 1) {
+      return sliceArray;
+    }
+    return Arrays.copyOf(sliceArray, j);
+  }
+
+  public static int[] slice(final int[] array, final int start, final int end) {
+    return slice(array, start, end, 1);
+  }
+
+  public static int[] slice(final int[] array, final int start, final int end, final int step) {
+    if (array == null || array.length == 0) {
+      return EMPTY_INTEGER_ARRAY;
+    }
+    final int length = array.length;
+    final int useStart = start < 0 ? length + start : start;
+    final int useEnd = Math.min((end < 0 ? length + end : end), length);
+    final int sliceLength = useEnd - useStart;
+    if (sliceLength < 0 || useStart > (length - 1)) {
+      return EMPTY_INTEGER_ARRAY;
+    }
+    final int useStep = Math.max(step, 1);
+    final int[] sliceArray = new int[sliceLength];
+    int j = 0;
+    for (int i = useStart; i < useEnd; i += useStep, j++) {
+      sliceArray[j] = array[i];
+    }
+    if (sliceLength - j == 1) {
+      return sliceArray;
+    }
+    return Arrays.copyOf(sliceArray, j);
+  }
+
+  public static long[] slice(final long[] array, final int start, final int end) {
+    return slice(array, start, end, 1);
+  }
+
+  public static long[] slice(final long[] array, final int start, final int end, final int step) {
+    if (array == null || array.length == 0) {
+      return EMPTY_LONG_ARRAY;
+    }
+    final int length = array.length;
+    final int useStart = start < 0 ? length + start : start;
+    final int useEnd = Math.min((end < 0 ? length + end : end), length);
+    final int sliceLength = useEnd - useStart;
+    if (sliceLength < 0 || useStart > (length - 1)) {
+      return EMPTY_LONG_ARRAY;
+    }
+    final int useStep = Math.max(step, 1);
+    final long[] sliceArray = new long[sliceLength];
+    int j = 0;
+    for (int i = useStart; i < useEnd; i += useStep, j++) {
+      sliceArray[j] = array[i];
+    }
+    if (sliceLength - j == 1) {
+      return sliceArray;
+    }
+    return Arrays.copyOf(sliceArray, j);
+  }
+
+  public static short[] slice(final short[] array, final int start, final int end) {
+    return slice(array, start, end, 1);
+  }
+
+  public static short[] slice(final short[] array, final int start, final int end, final int step) {
+    if (array == null || array.length == 0) {
+      return EMPTY_SHORT_ARRAY;
+    }
+    final int length = array.length;
+    final int useStart = start < 0 ? length + start : start;
+    final int useEnd = Math.min((end < 0 ? length + end : end), length);
+    final int sliceLength = useEnd - useStart;
+    if (sliceLength < 0 || useStart > (length - 1)) {
+      return EMPTY_SHORT_ARRAY;
+    }
+    final int useStep = Math.max(step, 1);
+    final short[] sliceArray = new short[sliceLength];
+    int j = 0;
+    for (int i = useStart; i < useEnd; i += useStep, j++) {
+      sliceArray[j] = array[i];
+    }
+    if (sliceLength - j == 1) {
+      return sliceArray;
+    }
+    return Arrays.copyOf(sliceArray, j);
   }
 
   public static boolean[] unwrap(final Boolean[] array) {

@@ -55,7 +55,7 @@ public class Objects {
       return null;
     } else if (elements != null && (array == null || array.length == 0)) {
       return Arrays.copyOf(elements, elements.length);
-    } else if (array != null && (elements == null || elements.length == 0)) {
+    } else if (elements == null || elements.length == 0) {
       return Arrays.copyOf(array, array.length);
     }
     final Class<?> act = array.getClass().getComponentType();
@@ -94,7 +94,7 @@ public class Objects {
       return null;
     } else if (elements != null && (array == null || array.length == 0)) {
       return Arrays.copyOf(elements, elements.length);
-    } else if (array != null && (elements == null || elements.length == 0)) {
+    } else if (elements == null || elements.length == 0) {
       return Arrays.copyOf(array, array.length);
     }
     final Class<?> act = array.getClass().getComponentType();
@@ -173,24 +173,24 @@ public class Objects {
     return asStrings(null, streamOf(it).map(java.util.Objects::toString).toArray(Object[]::new));
   }
 
-  public static String[] asStrings(Object... objs) {
-    return asStrings(null, objs);
+  public static String[] asStrings(Object... objects) {
+    return asStrings(null, objects);
   }
 
-  public static String[] asStrings(UnaryOperator<String> uo, Object... objs) {
-    if (objs == null) {
+  public static String[] asStrings(UnaryOperator<String> uo, Object... objects) {
+    if (objects == null) {
       return Strings.EMPTY_ARRAY;
     }
     if (uo == null) {
-      return Arrays.stream(objs).map(o -> asString(o, Strings.NULL)).toArray(String[]::new);
+      return Arrays.stream(objects).map(o -> asString(o, Strings.NULL)).toArray(String[]::new);
     } else {
-      return Arrays.stream(objs).map(o -> uo.apply(asString(o, Strings.NULL)))
+      return Arrays.stream(objects).map(o -> uo.apply(asString(o, Strings.NULL)))
           .toArray(String[]::new);
     }
   }
 
   /**
-   * Null safe comparison of Comparables. null is assumed to be less than a non-null value.
+   * Null safe comparison of Comparable. null is assumed to be less than a non-null value.
    * <p>
    * Note: Code come from apache.
    *
@@ -232,9 +232,9 @@ public class Objects {
   /**
    * Return true if at least one of the given parameter is not null and false otherwise.
    */
-  public static boolean containsNotNull(Object... objs) {
-    if (isNotEmpty(objs)) {
-      for (Object obj : objs) {
+  public static boolean containsNotNull(Object... objects) {
+    if (isNotEmpty(objects)) {
+      for (Object obj : objects) {
         if (isNotNull(obj)) {
           return true;
         }
@@ -386,9 +386,9 @@ public class Objects {
   /**
    * Return true if all given parameter are not null and false otherwise.
    */
-  public static boolean isNoneNull(Object... objs) {
-    if (isNotEmpty(objs)) {
-      for (Object obj : objs) {
+  public static boolean isNoneNull(Object... objects) {
+    if (isNotEmpty(objects)) {
+      for (Object obj : objects) {
         if (isNull(obj)) {
           return false;
         }
@@ -417,13 +417,13 @@ public class Objects {
    * comparable are null, return the greatest of the non-null objects.
    *
    * @param <T> the comparable type
-   * @param comparables the given comparable object to find out the max one
+   * @param comparable the given comparable object to find out the max one
    */
   @SuppressWarnings("unchecked")
-  public static <T extends Comparable<? super T>> T max(final T... comparables) {
+  public static <T extends Comparable<? super T>> T max(final T... comparable) {
     T result = null;
-    if (comparables != null) {
-      for (final T value : comparables) {
+    if (comparable != null) {
+      for (final T value : comparable) {
         int c;
         if (value == result) {
           c = 0;
@@ -444,16 +444,16 @@ public class Objects {
 
   /**
    * Return the min one, if the two parameters are the same, then return the first. If any of the
-   * comparables are null, return the least of the non-null objects.
+   * comparable are null, return the least of the non-null objects.
    *
    * @param <T> the comparable type
-   * @param comparables the given comparable object to find out the min one
+   * @param comparable the given comparable object to find out the min one
    */
   @SuppressWarnings("unchecked")
-  public static <T extends Comparable<? super T>> T min(final T... comparables) {
+  public static <T extends Comparable<? super T>> T min(final T... comparable) {
     T result = null;
-    if (comparables != null) {
-      for (final T value : comparables) {
+    if (comparable != null) {
+      for (final T value : comparable) {
         int c;
         if (value == result) {
           c = 0;
@@ -548,6 +548,35 @@ public class Objects {
     return Arrays.copyOf(removedArray, j);
   }
 
+  public static <T> T[] slice(final T[] array, final int start, final int end) {
+    return slice(array, start, end, 1);
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <T> T[] slice(final T[] array, final int start, final int end, final int step) {
+    if (array == null) {
+      return null;
+    }
+    final int length = array.length;
+    final int useStart = start < 0 ? length + start : start;
+    final int useEnd = Math.min((end < 0 ? length + end : end), length);
+    final int sliceLength = useEnd - useStart;
+    final Class<?> act = array.getClass().getComponentType();
+    if (sliceLength < 0 || useStart > (length - 1)) {
+      return (T[]) Array.newInstance(act, 0);
+    }
+    final int useStep = Math.max(step, 1);
+    final T[] sliceArray = (T[]) Array.newInstance(act, sliceLength);
+    int j = 0;
+    for (int i = useStart; i < useEnd; i += useStep, j++) {
+      sliceArray[j] = array[i];
+    }
+    if (sliceLength - j == 1) {
+      return sliceArray;
+    }
+    return Arrays.copyOf(sliceArray, j);
+  }
+
   /**
    * Swaps the two specified elements in the specified array.
    *
@@ -574,5 +603,4 @@ public class Objects {
     }
     return null;
   }
-
 }
