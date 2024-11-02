@@ -44,7 +44,7 @@ import java.util.function.Supplier;
  * corant-shared
  * <p>
  * Extracted from apache common-lang3.
- *
+ * <p>
  * Static methods for working with types.
  */
 public class Types {
@@ -86,8 +86,7 @@ public class Types {
       }
       return false;
     }
-    if (type instanceof WildcardType) {
-      final WildcardType wild = (WildcardType) type;
+    if (type instanceof WildcardType wild) {
       return containsTypeVariables(getImplicitLowerBounds(wild)[0])
           || containsTypeVariables(getImplicitUpperBounds(wild)[0]);
     }
@@ -204,8 +203,7 @@ public class Types {
    * @return component type or null if type is not an array type
    */
   public static Type getArrayComponentType(final Type type) {
-    if (type instanceof Class<?>) {
-      final Class<?> cls = (Class<?>) type;
+    if (type instanceof Class<?> cls) {
       return cls.isArray() ? cls.getComponentType() : null;
     }
     if (type instanceof GenericArrayType) {
@@ -433,7 +431,7 @@ public class Types {
   /**
    * Tests if the subject type may be implicitly cast to the target type following the Java generics
    * rules. If both types are {@link Class} objects, the method returns the result of
-   * {@link ClassUtils#isAssignable(Class, Class)}.
+   * {@link Classes#isAssignable(Class, Class, boolean)}.
    *
    * @param type the subject type to be assigned to the target type
    * @param toType the target type
@@ -522,7 +520,7 @@ public class Types {
    *         {@code null}
    * @since 3.2
    */
-  public static final ParameterizedType parameterize(final Class<?> rawClass,
+  public static ParameterizedType parameterize(final Class<?> rawClass,
       final Map<TypeVariable<?>, Type> typeVariableMap) {
     shouldNotNull(rawClass, "rawClass");
     shouldNotNull(typeVariableMap, "typeVariableMap");
@@ -539,7 +537,7 @@ public class Types {
    * @throws NullPointerException if {@code rawClass} is {@code null}
    * @since 3.2
    */
-  public static final ParameterizedType parameterize(final Class<?> rawClass,
+  public static ParameterizedType parameterize(final Class<?> rawClass,
       final Type... typeArguments) {
     return parameterizeWithOwner(null, rawClass, typeArguments);
   }
@@ -555,8 +553,8 @@ public class Types {
    *         {@code null}
    * @since 3.2
    */
-  public static final ParameterizedType parameterizeWithOwner(final Type owner,
-      final Class<?> rawClass, final Map<TypeVariable<?>, Type> typeVariableMap) {
+  public static ParameterizedType parameterizeWithOwner(final Type owner, final Class<?> rawClass,
+      final Map<TypeVariable<?>, Type> typeVariableMap) {
     shouldNotNull(rawClass, "rawClass");
     shouldNotNull(typeVariableMap, "typeVariableMap");
     return parameterizeWithOwner(owner, rawClass,
@@ -574,8 +572,8 @@ public class Types {
    * @throws NullPointerException if {@code rawClass} is {@code null}
    * @since 3.2
    */
-  public static final ParameterizedType parameterizeWithOwner(final Type owner,
-      final Class<?> rawClass, final Type... typeArguments) {
+  public static ParameterizedType parameterizeWithOwner(final Type owner, final Class<?> rawClass,
+      final Type... typeArguments) {
     shouldNotNull(rawClass, "rawClass");
     final Type useOwner;
     if (rawClass.getEnclosingClass() == null) {
@@ -608,8 +606,7 @@ public class Types {
     shouldNotNull(typeVariable, "typeVariable");
     final StringBuilder buf = new StringBuilder();
     final GenericDeclaration d = typeVariable.getGenericDeclaration();
-    if (d instanceof Class<?>) {
-      Class<?> c = (Class<?>) d;
+    if (d instanceof Class<?> c) {
       while (true) {
         if (c.getEnclosingClass() == null) {
           buf.insert(0, c.getName());
@@ -698,8 +695,7 @@ public class Types {
       if (type instanceof TypeVariable<?>) {
         return unrollVariables(typeArguments, typeArguments.get(type));
       }
-      if (type instanceof ParameterizedType) {
-        final ParameterizedType p = (ParameterizedType) type;
+      if (type instanceof ParameterizedType p) {
         final Map<TypeVariable<?>, Type> parameterizedTypeArguments;
         if (p.getOwnerType() == null) {
           parameterizedTypeArguments = typeArguments;
@@ -716,8 +712,7 @@ public class Types {
         }
         return parameterizeWithOwner(p.getOwnerType(), (Class<?>) p.getRawType(), args);
       }
-      if (type instanceof WildcardType) {
-        final WildcardType wild = (WildcardType) type;
+      if (type instanceof WildcardType wild) {
         return wildcardType().withUpperBounds(unrollBounds(typeArguments, wild.getUpperBounds()))
             .withLowerBounds(unrollBounds(typeArguments, wild.getLowerBounds())).get();
       }
@@ -831,12 +826,10 @@ public class Types {
    * @return boolean
    */
   private static boolean equals(final ParameterizedType parameterizedType, final Type type) {
-    if (type instanceof ParameterizedType) {
-      final ParameterizedType other = (ParameterizedType) type;
-      if (equals(parameterizedType.getRawType(), other.getRawType())
-          && equals(parameterizedType.getOwnerType(), other.getOwnerType())) {
-        return equals(parameterizedType.getActualTypeArguments(), other.getActualTypeArguments());
-      }
+    if ((type instanceof ParameterizedType other)
+        && (equals(parameterizedType.getRawType(), other.getRawType())
+            && equals(parameterizedType.getOwnerType(), other.getOwnerType()))) {
+      return equals(parameterizedType.getActualTypeArguments(), other.getActualTypeArguments());
     }
     return false;
   }
@@ -868,8 +861,7 @@ public class Types {
    * @return boolean
    */
   private static boolean equals(final WildcardType wildcardType, final Type type) {
-    if (type instanceof WildcardType) {
-      final WildcardType other = (WildcardType) type;
+    if (type instanceof WildcardType other) {
       return equals(getImplicitLowerBounds(wildcardType), getImplicitLowerBounds(other))
           && equals(getImplicitUpperBounds(wildcardType), getImplicitUpperBounds(other));
     }
@@ -1048,9 +1040,8 @@ public class Types {
     final Type ownerType = parameterizedType.getOwnerType();
     final Map<TypeVariable<?>, Type> typeVarAssigns;
 
-    if (ownerType instanceof ParameterizedType) {
+    if (ownerType instanceof ParameterizedType parameterizedOwnerType) {
       // get the owner type arguments first
-      final ParameterizedType parameterizedOwnerType = (ParameterizedType) ownerType;
       typeVarAssigns = getTypeArguments(parameterizedOwnerType, getRawType(parameterizedOwnerType),
           subtypeVarAssigns);
     } else {
@@ -1221,8 +1212,7 @@ public class Types {
 
     final Type toComponentType = toGenericArrayType.getGenericComponentType();
 
-    if (type instanceof Class<?>) {
-      final Class<?> cls = (Class<?>) type;
+    if (type instanceof Class<?> cls) {
 
       // compare the component types
       return cls.isArray() && isAssignable(cls.getComponentType(), toComponentType, typeVarAssigns);
@@ -1451,8 +1441,7 @@ public class Types {
     final Type[] toUpperBounds = getImplicitUpperBounds(toWildcardType);
     final Type[] toLowerBounds = getImplicitLowerBounds(toWildcardType);
 
-    if (type instanceof WildcardType) {
-      final WildcardType wildcardType = (WildcardType) type;
+    if (type instanceof WildcardType wildcardType) {
       final Type[] upperBounds = getImplicitUpperBounds(wildcardType);
       final Type[] lowerBounds = getImplicitLowerBounds(wildcardType);
 
