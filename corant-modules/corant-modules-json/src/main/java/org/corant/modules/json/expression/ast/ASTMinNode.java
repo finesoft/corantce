@@ -57,6 +57,10 @@ public class ASTMinNode extends AbstractASTNode<Object> {
   @Override
   public void postConstruct() {
     super.postConstruct();
+    if (children.size() == 1 && children.get(0) instanceof ASTArrayNode an) {
+      children.clear();
+      an.getChildren().forEach(this::addChild);
+    }
     inputNode = children.get(0);
     sortableNamesNode = (ASTDeclarationNode) children.get(1);
     sorterNode = children.get(2);

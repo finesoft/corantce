@@ -37,6 +37,15 @@ public interface ASTLogicNode extends ASTPredicateNode {
       return type;
     }
 
+    @Override
+    public void postConstruct() {
+      super.postConstruct();
+      if (children.size() == 1 && children.get(0) instanceof ASTArrayNode an) {
+        children.clear();
+        an.getChildren().forEach(this::addChild);
+      }
+    }
+
     protected boolean removeChildIf(Predicate<ASTNode<?>> filter) {
       return children.removeIf(filter);
     }

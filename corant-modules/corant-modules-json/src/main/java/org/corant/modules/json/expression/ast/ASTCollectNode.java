@@ -63,6 +63,10 @@ public class ASTCollectNode extends AbstractASTNode<Object> {
   @Override
   public void postConstruct() {
     super.postConstruct();
+    if (children.size() == 1 && children.get(0) instanceof ASTArrayNode an) {
+      children.clear();
+      an.getChildren().forEach(this::addChild);
+    }
     inputNode = children.get(0);
     // supplier & accumulator & combiner(fake)
     supplierNode = children.get(1);

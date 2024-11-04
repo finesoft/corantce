@@ -70,7 +70,7 @@ public interface EvaluationContext extends Sortable {
     @Override
     public Object resolveVariableValue(Node<?> node) {
       ASTVariableNode varNode = (ASTVariableNode) node;
-      return variables.get(varNode.getName());
+      return getMapKeyPathValue(variables, varNode.getNamespace(), false);// variables.get(varNode.getName());
     }
 
   }

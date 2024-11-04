@@ -38,4 +38,13 @@ public class ASTArrayNode extends AbstractASTNode<Object> {
     return children.stream().map(c -> c.getValue(ctx)).collect(Collectors.toList());
   }
 
+  @Override
+  public void postConstruct() {
+    super.postConstruct();
+    if (children.size() == 1 && children.get(0) instanceof ASTArrayNode an) {
+      children.clear();
+      an.getChildren().forEach(this::addChild);
+    }
+  }
+
 }

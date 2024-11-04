@@ -30,6 +30,10 @@ public class ASTNVLNode extends AbstractASTNode<Object> {
 
   @Override
   public Object getValue(EvaluationContext ctx) {
+    if (children.size() == 1 && children.get(0) instanceof ASTArrayNode an) {
+      children.clear();
+      an.getChildren().forEach(this::addChild);
+    }
     Object value = children.get(0).getValue(ctx);
     if (children.size() == 2) {
       return value == null ? children.get(1).getValue(ctx) : value;

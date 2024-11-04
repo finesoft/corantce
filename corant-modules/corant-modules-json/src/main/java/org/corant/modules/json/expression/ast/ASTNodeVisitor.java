@@ -14,7 +14,11 @@
 package org.corant.modules.json.expression.ast;
 
 import static org.corant.shared.util.Assertions.shouldBeTrue;
+import static org.corant.shared.util.Empties.sizeOf;
 import static org.corant.shared.util.Strings.isNotBlank;
+import java.util.ArrayList;
+import java.util.List;
+import org.corant.modules.json.expression.Node;
 import org.corant.modules.json.expression.ParseException;
 import org.corant.shared.ubiquity.Sortable;
 
@@ -35,32 +39,65 @@ public interface ASTNodeVisitor extends Sortable {
       case CP_LTE:
       case CP_NE:
       case CP_NES:
-      case LG_XOR:
-        shouldBeTrue(node.getChildren().size() == 2,
-            () -> new ParseException("AST node [%s] must contain 2 children nodes",
-                node.getType().token()));
+      case LG_XOR: {
+        if (node.getChildren().size() == 1) {
+          shouldBeTrue(
+              node.getChildren().get(0) instanceof ASTArrayNode an && an.getChildren().size() == 2,
+              () -> new ParseException("AST node [%s] must contain 2 children nodes",
+                  node.getType().token()));
+        } else {
+          shouldBeTrue(node.getChildren().size() == 2,
+              () -> new ParseException("AST node [%s] must contain 2 children nodes",
+                  node.getType().token()));
+        }
         break;
+      }
       case NON_NULL:
       case IS_NULL:
         shouldBeTrue(node.getChildren().size() == 1);
         break;
-      case CP_REGEX:
+      case CP_REGEX: {
+        List<? extends Node<?>> nodes = new ArrayList<>();
+        if (node.getChildren().size() == 1
+            && node.getChildren().get(0) instanceof ASTArrayNode an) {
+          nodes = an.getChildren();
+        } else {
+          nodes = node.getChildren();
+        }
         shouldBeTrue(
-            node.getChildren().size() == 2
-                && ((ASTNode<?>) node.getChildren().get(1)).getType() == ASTNodeType.VALUE,
+            sizeOf(nodes) == 2 && ((ASTNode<?>) nodes.get(1)).getType() == ASTNodeType.VALUE,
             () -> new ParseException(
                 "AST node [%s] must contain 2 children nodes and the second must be a value node",
                 node.getType().token()));
         break;
-      case CP_BTW:
-        shouldBeTrue(node.getChildren().size() == 3);
+      }
+      case CP_BTW: {
+        List<? extends Node<?>> nodes = new ArrayList<>();
+        if (node.getChildren().size() == 1
+            && node.getChildren().get(0) instanceof ASTArrayNode an) {
+          nodes = an.getChildren();
+        } else {
+          nodes = node.getChildren();
+        }
+        shouldBeTrue(sizeOf(nodes) == 3,
+            () -> new ParseException("AST node [%s] must contain 3 children nodes",
+                node.getType().token()));
         break;
+      }
       case CONDITIONAL:
-      case NVL:
-        shouldBeTrue(node.getChildren().size() == 2 || node.getChildren().size() == 3,
+      case NVL: {
+        List<? extends Node<?>> nodes = new ArrayList<>();
+        if (node.getChildren().size() == 1
+            && node.getChildren().get(0) instanceof ASTArrayNode an) {
+          nodes = an.getChildren();
+        } else {
+          nodes = node.getChildren();
+        }
+        shouldBeTrue(sizeOf(nodes) == 2 || sizeOf(nodes) == 3,
             () -> new ParseException("AST node [%s] must contain 2 or 3 children nodes",
                 node.getType().token()));
         break;
+      }
       case CP_IN:
       case CP_NIN:
       case LG_AND:
@@ -72,42 +109,70 @@ public interface ASTNodeVisitor extends Sortable {
       case SUBROUTINE:
         shouldBeTrue(!node.getChildren().isEmpty());
         break;
-      case FILTER:
+      case FILTER: {
+        List<? extends Node<?>> nodes = new ArrayList<>();
+        if (node.getChildren().size() == 1
+            && node.getChildren().get(0) instanceof ASTArrayNode an) {
+          nodes = an.getChildren();
+        } else {
+          nodes = node.getChildren();
+        }
         shouldBeTrue(
-            node.getChildren().size() == 3
-                && node.getChildren().get(1) instanceof ASTDeclarationNode vn
+            sizeOf(nodes) == 3 && nodes.get(1) instanceof ASTDeclarationNode vn
                 && vn.value() instanceof String vns && isNotBlank(vns),
             () -> new ParseException(
                 "AST node [%s] must contain 3 children nodes and the second must be a declaration node",
                 node.getType().token()));
         break;
-      case MAP:
+      }
+      case MAP: {
+        List<? extends Node<?>> nodes = new ArrayList<>();
+        if (node.getChildren().size() == 1
+            && node.getChildren().get(0) instanceof ASTArrayNode an) {
+          nodes = an.getChildren();
+        } else {
+          nodes = node.getChildren();
+        }
         shouldBeTrue(
-            node.getChildren().size() == 3
-                && node.getChildren().get(1) instanceof ASTDeclarationNode vn
+            sizeOf(nodes) == 3 && nodes.get(1) instanceof ASTDeclarationNode vn
                 && vn.getVariableNames().length == 1,
             () -> new ParseException(
                 "AST node [%s] must contain 3 children nodes and the second must be a declaration node containing 1 variable declaration",
                 node.getType().token()));
         break;
+      }
       case SORT:
       case MAX:
-      case MIN:
+      case MIN: {
+        List<? extends Node<?>> nodes = new ArrayList<>();
+        if (node.getChildren().size() == 1
+            && node.getChildren().get(0) instanceof ASTArrayNode an) {
+          nodes = an.getChildren();
+        } else {
+          nodes = node.getChildren();
+        }
         shouldBeTrue(
-            node.getChildren().size() == 3
-                && node.getChildren().get(1) instanceof ASTDeclarationNode vn
+            sizeOf(nodes) == 3 && nodes.get(1) instanceof ASTDeclarationNode vn
                 && vn.getVariableNames().length == 2,
             () -> new ParseException(
                 "AST node [%s] nodes must contain 3 children nodes and the second must be a declaration node containing 2 variable declarations",
                 node.getType().token()));
         break;
+      }
       case REDUCE: {
-        if (node.getChildren().size() == 3) {
-          shouldBeTrue(node.getChildren().get(1) instanceof ASTDeclarationNode vn
-              && vn.getVariableNames().length == 2);
-        } else if (node.getChildren().size() == 4) {
-          shouldBeTrue(node.getChildren().get(2) instanceof ASTDeclarationNode vn
-              && vn.getVariableNames().length == 2);
+        List<? extends Node<?>> nodes = new ArrayList<>();
+        if (node.getChildren().size() == 1
+            && node.getChildren().get(0) instanceof ASTArrayNode an) {
+          nodes = an.getChildren();
+        } else {
+          nodes = node.getChildren();
+        }
+        if (sizeOf(nodes) == 3) {
+          shouldBeTrue(
+              nodes.get(1) instanceof ASTDeclarationNode vn && vn.getVariableNames().length == 2);
+        } else if (sizeOf(nodes) == 4) {
+          shouldBeTrue(
+              nodes.get(2) instanceof ASTDeclarationNode vn && vn.getVariableNames().length == 2);
         }
         // else if (node.getChildren().size() == 6) {
         // shouldBeTrue(node.getChildren().get(2) instanceof ASTDeclarationNode avn
@@ -122,22 +187,30 @@ public interface ASTNodeVisitor extends Sortable {
         }
         break;
       }
-      case COLLECT:
+      case COLLECT: {
         // if (node.getChildren().size() == 6) {
         // shouldBeTrue(node.getChildren().get(2) instanceof ASTDeclarationNode avn
         // && avn.getVariableNames().length == 2
         // && node.getChildren().get(4) instanceof ASTDeclarationNode cvn
         // && cvn.getVariableNames().length == 2);
         // } else
-        if (node.getChildren().size() == 4) {
-          shouldBeTrue(node.getChildren().get(2) instanceof ASTDeclarationNode avn
-              && avn.getVariableNames().length == 2);
+        List<? extends Node<?>> nodes = new ArrayList<>();
+        if (node.getChildren().size() == 1
+            && node.getChildren().get(0) instanceof ASTArrayNode an) {
+          nodes = an.getChildren();
+        } else {
+          nodes = node.getChildren();
+        }
+        if (sizeOf(nodes) == 4) {
+          shouldBeTrue(
+              nodes.get(2) instanceof ASTDeclarationNode avn && avn.getVariableNames().length == 2);
         } else {
           throw new ParseException(
               "AST node [%s] must contain a target object and a variable declaration and an accumulator expression!",
               node.getType().token());
         }
         break;
+      }
       default:
         break;
     }

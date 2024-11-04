@@ -74,6 +74,15 @@ public interface ASTComparisonNode extends ASTPredicateNode {
       return type;
     }
 
+    @Override
+    public void postConstruct() {
+      super.postConstruct();
+      if (children.size() == 1 && children.get(0) instanceof ASTArrayNode an) {
+        children.clear();
+        an.getChildren().forEach(this::addChild);
+      }
+    }
+
     protected int compare(EvaluationContext ctx) {
       Object left = getLeftValue(ctx);// FIXME wrap?
       Object right = getRightValue(ctx);// FIXME wrap?
@@ -86,21 +95,21 @@ public interface ASTComparisonNode extends ASTPredicateNode {
     @SuppressWarnings("unchecked")
     protected int compare(Object left, Object right) {
       if (left instanceof Number ln && right instanceof Number rn) {
-        if (ln instanceof Long || rn instanceof Long) {
+        if (ln instanceof Long && rn instanceof Long) {
           return Long.compare(ln.longValue(), rn.longValue());
-        } else if (ln instanceof Integer || rn instanceof Integer) {
+        } else if (ln instanceof Integer && rn instanceof Integer) {
           return Integer.compare(ln.intValue(), rn.intValue());
-        } else if (ln instanceof BigDecimal || rn instanceof BigDecimal) {
+        } else if (ln instanceof BigDecimal && rn instanceof BigDecimal) {
           return compare(ln, rn, BigDecimal.class);
-        } else if (ln instanceof Double || rn instanceof Double) {
+        } else if (ln instanceof Double && rn instanceof Double) {
           return Double.compare(ln.doubleValue(), rn.doubleValue());
-        } else if (ln instanceof Float || rn instanceof Float) {
+        } else if (ln instanceof Float && rn instanceof Float) {
           return Float.compare(ln.floatValue(), rn.floatValue());
-        } else if (ln instanceof BigInteger || rn instanceof BigInteger) {
+        } else if (ln instanceof BigInteger && rn instanceof BigInteger) {
           return compare(ln, rn, BigInteger.class);
-        } else if (ln instanceof Short || rn instanceof Short) {
+        } else if (ln instanceof Short && rn instanceof Short) {
           return Short.compare(ln.shortValue(), rn.shortValue());
-        } else if (ln instanceof Byte || rn instanceof Byte) {
+        } else if (ln instanceof Byte && rn instanceof Byte) {
           return Byte.compare(ln.byteValue(), rn.byteValue());
         } else {
           return compare(left, right, Double.class);
@@ -155,6 +164,7 @@ public interface ASTComparisonNode extends ASTPredicateNode {
     protected Object getRightValue(EvaluationContext ctx) {
       return getRight().getValue(ctx);
     }
+
   }
 
   class ASTBetweenNode extends AbstractASTComparisonNode {

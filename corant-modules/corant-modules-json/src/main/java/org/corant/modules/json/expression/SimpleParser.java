@@ -156,7 +156,9 @@ public class SimpleParser {
     if (jsonNode.isValueNode() || jsonNode.isNull()) {
       parseJsonValueNode(builder, visitor, parent, jsonNode);
     } else if (jsonNode.isArray()) {
-      parseJsonArrayNode(builder, visitor, parent, jsonNode);
+      ASTNode<?> arrayNode = builder.arrayNodeOf();
+      parseJsonArrayNode(builder, visitor, arrayNode, jsonNode);
+      makeRelation(visitor, parent, arrayNode);
     } else if (jsonNode.isObject()) {
       parseJsonObjectNode(builder, visitor, parent, jsonNode);
     }

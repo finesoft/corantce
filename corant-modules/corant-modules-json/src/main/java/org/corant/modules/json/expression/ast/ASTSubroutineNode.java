@@ -43,7 +43,10 @@ public class ASTSubroutineNode extends AbstractASTNode<Object> {
       }
     }
     if (varName != null) {
-      final List<ASTNode<?>> outputNodes = subList(children, 1, children.size());
+      List<? extends ASTNode<?>> outputNodes = subList(children, 1, children.size());
+      if (outputNodes.size() == 1 && outputNodes.get(0) instanceof ASTArrayNode an) {
+        outputNodes = an.getChildren();
+      }
       SubEvaluationContext useCtx = new SubEvaluationContext(ctx);
       Object val = null;
       for (ASTNode<?> outputNode : outputNodes) {
@@ -56,6 +59,15 @@ public class ASTSubroutineNode extends AbstractASTNode<Object> {
         val = outputNode.getValue(ctx);
       }
       return val;
+    }
+  }
+
+  @Override
+  public void postConstruct() {
+    super.postConstruct();
+    if (children.size() == 1 && children.get(0) instanceof ASTArrayNode an) {
+      children.clear();
+      an.getChildren().forEach(this::addChild);
     }
   }
 

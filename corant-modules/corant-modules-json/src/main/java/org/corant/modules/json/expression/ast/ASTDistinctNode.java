@@ -34,7 +34,6 @@ public class ASTDistinctNode extends AbstractASTNode<Object> {
 
   @Override
   public Object getValue(EvaluationContext ctx) {
-
     Node<?> inputNode = children.get(0);
     final Object input = inputNode.getValue(ctx);
 
@@ -44,6 +43,15 @@ public class ASTDistinctNode extends AbstractASTNode<Object> {
       return Streams.streamOf(itr).distinct().collect(Collectors.toList());
     } else {
       return input;
+    }
+  }
+
+  @Override
+  public void postConstruct() {
+    super.postConstruct();
+    if (children.size() == 1 && children.get(0) instanceof ASTArrayNode an) {
+      children.clear();
+      an.getChildren().forEach(this::addChild);
     }
   }
 

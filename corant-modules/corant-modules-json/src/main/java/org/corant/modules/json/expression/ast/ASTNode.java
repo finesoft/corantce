@@ -32,7 +32,7 @@ public interface ASTNode<T> extends Node<T> {
   }
 
   @Override
-  default List<? extends Node<?>> getChildren() {
+  default List<? extends ASTNode<?>> getChildren() {
     throw new NotSupportedException();
   }
 
@@ -59,7 +59,7 @@ public interface ASTNode<T> extends Node<T> {
     }
 
     @Override
-    public List<? extends Node<?>> getChildren() {
+    public List<? extends ASTNode<?>> getChildren() {
       return children;
     }
 
