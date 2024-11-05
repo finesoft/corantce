@@ -69,9 +69,16 @@ public interface ASTNode<T> extends Node<T> {
     }
 
     @Override
+    public void postConstruct() {
+      if (children.size() == 1 && children.get(0) instanceof ASTArrayNode an) {
+        children.clear();
+        an.getChildren().forEach(this::addChild);
+      }
+    }
+
+    @Override
     public void setParent(Node<?> parent) {
       this.parent = (ASTNode<?>) parent;
     }
-
   }
 }

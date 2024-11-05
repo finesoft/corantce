@@ -76,6 +76,9 @@ public class ASTObjectNode extends AbstractASTNode<Object> {
     }
   }
 
+  @Override
+  public void postConstruct() {}
+
   /**
    * corant-modules-json
    *

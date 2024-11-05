@@ -14,7 +14,6 @@
 package org.corant.modules.json.expression.ast;
 
 import static org.corant.shared.util.Assertions.shouldBeTrue;
-import static org.corant.shared.util.Conversions.toObject;
 import static org.corant.shared.util.Empties.sizeOf;
 import static org.corant.shared.util.Objects.areEqual;
 import java.math.BigDecimal;
@@ -74,15 +73,6 @@ public interface ASTComparisonNode extends ASTPredicateNode {
       return type;
     }
 
-    @Override
-    public void postConstruct() {
-      super.postConstruct();
-      if (children.size() == 1 && children.get(0) instanceof ASTArrayNode an) {
-        children.clear();
-        an.getChildren().forEach(this::addChild);
-      }
-    }
-
     protected int compare(EvaluationContext ctx) {
       Object left = getLeftValue(ctx);// FIXME wrap?
       Object right = getRightValue(ctx);// FIXME wrap?
@@ -95,24 +85,24 @@ public interface ASTComparisonNode extends ASTPredicateNode {
     @SuppressWarnings("unchecked")
     protected int compare(Object left, Object right) {
       if (left instanceof Number ln && right instanceof Number rn) {
-        if (ln instanceof Long && rn instanceof Long) {
-          return Long.compare(ln.longValue(), rn.longValue());
-        } else if (ln instanceof Integer && rn instanceof Integer) {
-          return Integer.compare(ln.intValue(), rn.intValue());
-        } else if (ln instanceof BigDecimal && rn instanceof BigDecimal) {
-          return compare(ln, rn, BigDecimal.class);
-        } else if (ln instanceof Double && rn instanceof Double) {
-          return Double.compare(ln.doubleValue(), rn.doubleValue());
-        } else if (ln instanceof Float && rn instanceof Float) {
-          return Float.compare(ln.floatValue(), rn.floatValue());
-        } else if (ln instanceof BigInteger && rn instanceof BigInteger) {
-          return compare(ln, rn, BigInteger.class);
-        } else if (ln instanceof Short && rn instanceof Short) {
-          return Short.compare(ln.shortValue(), rn.shortValue());
-        } else if (ln instanceof Byte && rn instanceof Byte) {
-          return Byte.compare(ln.byteValue(), rn.byteValue());
+        if (ln instanceof Long lnl && rn instanceof Long rnl) {
+          return lnl.compareTo(rnl);
+        } else if (ln instanceof Integer lni && rn instanceof Integer rni) {
+          return lni.compareTo(rni);
+        } else if (ln instanceof BigDecimal lnb && rn instanceof BigDecimal rnb) {
+          return lnb.compareTo(rnb);
+        } else if (ln instanceof Double lnd && rn instanceof Double rnd) {
+          return lnd.compareTo(rnd);
+        } else if (ln instanceof Float lnf && rn instanceof Float rnf) {
+          return lnf.compareTo(rnf);
+        } else if (ln instanceof BigInteger lnbi && rn instanceof BigInteger rnbi) {
+          return lnbi.compareTo(rnbi);
+        } else if (ln instanceof Short lns && rn instanceof Short rns) {
+          return lns.compareTo(rns);
+        } else if (ln instanceof Byte lnb && rn instanceof Byte rnb) {
+          return lnb.compareTo(rnb);
         } else {
-          return compare(left, right, Double.class);
+          return Double.compare(ln.doubleValue(), rn.doubleValue());
         }
       } else if (left instanceof TemporalAccessor && right instanceof TemporalAccessor) {
         if (left instanceof Date ld && right instanceof Date rd) {
@@ -140,8 +130,8 @@ public interface ASTComparisonNode extends ASTPredicateNode {
         } else if (left instanceof ZoneOffset lzo && right instanceof ZoneOffset rzo) {
           return lzo.compareTo(rzo);
         }
-      } else if (left instanceof String && right instanceof String) {
-        return left.toString().compareTo(right.toString());
+      } else if (left instanceof String ls && right instanceof String rs) {
+        return ls.compareTo(rs);
       } else if (left instanceof Duration ld && right instanceof Duration rd) {
         return ld.compareTo(rd);
       }
@@ -150,11 +140,6 @@ public interface ASTComparisonNode extends ASTPredicateNode {
       }
       throw new NotSupportedException(
           "Only supports same type comparable objects for comparison node");
-    }
-
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    protected int compare(Object left, Object right, Class<? extends Comparable> clazz) {
-      return toObject(left, clazz).compareTo(toObject(right, clazz));
     }
 
     protected Object getLeftValue(EvaluationContext ctx) {
