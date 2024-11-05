@@ -13,6 +13,7 @@
  */
 package org.corant.modules.query.shared.declarative;
 
+import static java.lang.String.format;
 import static org.corant.shared.util.Assertions.shouldNotNull;
 import static org.corant.shared.util.Classes.getUserClass;
 import static org.corant.shared.util.Configurations.getAssembledConfigValue;
@@ -22,11 +23,10 @@ import static org.corant.shared.util.Empties.isNotEmpty;
 import static org.corant.shared.util.Strings.defaultBlank;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.lang.reflect.WildcardType;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.logging.Logger;
 import java.util.stream.Stream;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.context.spi.CreationalContext;
@@ -50,8 +50,8 @@ import org.corant.modules.query.shared.NamedQueryServiceManager;
 import org.corant.modules.query.shared.QueryMappingService;
 import org.corant.shared.normal.Names;
 import org.corant.shared.util.Configurations;
-import org.corant.shared.util.Methods;
 import org.corant.shared.util.Objects;
+import org.corant.shared.util.Types;
 
 /**
  * corant-modules-query-shared
@@ -64,6 +64,10 @@ public class DeclarativeQueryServiceDelegateBean extends AbstractBean<Object> {
 
   static final boolean useDeclaredMethod =
       getConfigValue("corant.query.declarative.use-declared-method", Boolean.TYPE, false);
+  static final boolean verifyDeclaredMethodReturnType = getConfigValue(
+      "corant.query.declarative.verify-declared-method-return-type", Boolean.TYPE, false);
+
+  static Logger logger = Logger.getLogger(DeclarativeQueryServiceDelegateBean.class.getName());
 
   final Class<?> proxyType;
 
@@ -160,97 +164,52 @@ public class DeclarativeQueryServiceDelegateBean extends AbstractBean<Object> {
 
   void validateReturnType(String queryName, Method method, QueryWay queryWay) {
     Class<?> returnClass = method.getReturnType();
-    if (returnClass.equals(Void.TYPE) || returnClass.equals(Object.class)) {
+    if (returnClass.equals(Void.TYPE) || returnClass.equals(Object.class)
+        || Modifier.isStatic(method.getModifiers()) || method.isDefault()) {
       return;
     }
-    Class<?>[] methodResultClass = null;
     Type returnType = method.getGenericReturnType();
-    if (returnType instanceof ParameterizedType pt) {
-      if (pt.getActualTypeArguments().length > 1) {
-        throw new QueryRuntimeException(
-            "Declarative query service [%s] method [%s] return type error, type mismatch!",
-            proxyType, method);
-      } else if (pt.getActualTypeArguments().length == 1) {
-        if (pt.getActualTypeArguments()[0] instanceof Class<?> pc) {
-          methodResultClass = new Class<?>[] {pc};
-        } else if (pt.getActualTypeArguments()[0] instanceof WildcardType wpt) {
-          // TODO FIXME check bounds
-          if (wpt.getLowerBounds().length > 0) {
-            methodResultClass = Arrays.stream(wpt.getLowerBounds()).filter(Class.class::isInstance)
-                .map(x -> (Class<?>) x).toArray(Class[]::new);
-          } else if (wpt.getUpperBounds().length > 0) {
-            methodResultClass = Arrays.stream(wpt.getUpperBounds()).filter(Class.class::isInstance)
-                .map(x -> (Class<?>) x).toArray(Class[]::new);
-          }
-        }
-      }
-      if (pt.getRawType() instanceof Class<?> rtc) {
-        returnClass = rtc;
-      }
-    } else if (returnType instanceof Class<?> c) {
-      methodResultClass = new Class<?>[] {c};
-      returnClass = c;
+    Type queryResultType =
+        Beans.resolve(QueryMappingService.class).getQuery(queryName).getResultClass();
+    if (queryResultType.equals(Map.class)) {
+      queryResultType = Types.parameterize(Map.class, Object.class, Object.class);
     }
-
     if (queryWay == QueryWay.SELECT) {
-      if (!Methods.isParameterTypesMatching(new Class[] {List.class}, new Class[] {returnClass},
-          true, false)) {
-        throw new QueryRuntimeException(
-            "Declarative query service [%s] method [%s] return type error, the type must be a [%s]",
-            proxyType, method, List.class.getName());
+      Type resultType = Types.parameterize(List.class, queryResultType);
+      if (!Types.isAssignable(resultType, returnType)) {
+        handleValidateReturnTypeIssues(proxyType, method, resultType);
       }
-      if (methodResultClass == null
-          || (methodResultClass.length == 1 && methodResultClass[0].equals(returnClass))) {
-        return;
-      }
-    } else if (queryWay == QueryWay.PAGE) {
-      if (!Methods.isParameterTypesMatching(new Class[] {Paging.class}, new Class[] {returnClass},
-          true, false)) {
-        throw new QueryRuntimeException(
-            "Declarative query service [%s] method [%s] return type error, the type must be a [%s]",
-            proxyType, method, Paging.class.getName());
-      }
-      if (methodResultClass == null
-          || (methodResultClass.length == 1 && methodResultClass[0].equals(returnClass))) {
-        return;
+    } else if (queryWay == QueryWay.GET) {
+      if (!Types.isAssignable(queryResultType, returnType)) {
+        handleValidateReturnTypeIssues(proxyType, method, queryResultType);
       }
     } else if (queryWay == QueryWay.FORWARD) {
-      if (!Methods.isParameterTypesMatching(new Class[] {Forwarding.class},
-          new Class[] {returnClass}, true, false)) {
-        throw new QueryRuntimeException(
-            "Declarative query service [%s] method [%s] return type error, the type must be a [%s]",
-            proxyType, method, Forwarding.class.getName());
+      Type resultType = Types.parameterize(Forwarding.class, queryResultType);
+      if (!Types.isAssignable(resultType, returnType)) {
+        handleValidateReturnTypeIssues(proxyType, method, resultType);
       }
-      if (methodResultClass == null
-          || (methodResultClass.length == 1 && methodResultClass[0].equals(returnClass))) {
-        return;
+    } else if (queryWay == QueryWay.PAGE) {
+      Type resultType = Types.parameterize(Paging.class, queryResultType);
+      if (!Types.isAssignable(resultType, returnType)) {
+        handleValidateReturnTypeIssues(proxyType, method, resultType);
       }
-    } else if (queryWay == QueryWay.STREAM) {
-      if (!Methods.isParameterTypesMatching(new Class[] {Stream.class}, new Class[] {returnClass},
-          true, false)) {
-        throw new QueryRuntimeException(
-            "Declarative query service [%s] method [%s] return type error, the type must be a [%s]",
-            proxyType, method, List.class.getName());
-      }
-      if (methodResultClass == null
-          || (methodResultClass.length == 1 && methodResultClass[0].equals(returnClass))) {
-        return;
+    } else if ((queryWay == QueryWay.STREAM)) {
+      Type resultType = Types.parameterize(Stream.class, queryResultType);
+      if (!Types.isAssignable(resultType, returnType)) {
+        handleValidateReturnTypeIssues(proxyType, method, resultType);
       }
     }
-    if (isNotEmpty(methodResultClass)) {
-      Class<?> queryResultClass =
-          Beans.resolve(QueryMappingService.class).getQuery(queryName).getResultClass();
-      if (queryResultClass != null) {
-        for (Class<?> mrc : methodResultClass) {
-          if (Methods.isParameterTypesMatching(new Class[] {queryResultClass}, new Class[] {mrc},
-              true, false)) {
-            return;
-          }
-        }
-        throw new QueryRuntimeException(
-            "Declarative query service:[%s] method:[%s] return type error, the type must be a [%s]",
-            proxyType, method, queryResultClass.getName());
-      }
+  }
+
+  private void handleValidateReturnTypeIssues(Class<?> proxyType, Method method, Type resultType) {
+    if (verifyDeclaredMethodReturnType) {
+      throw new QueryRuntimeException(
+          "Declarative query service [%s] method [%s] return type mismatch, the type should be [%s]",
+          proxyType, method.getName(), Types.toString(resultType));
+    } else {
+      logger.warning(format(
+          "Declarative query service [%s] method [%s] return type mismatch, the type should be [%s]",
+          proxyType, method.getName(), Types.toString(resultType)));
     }
   }
 }

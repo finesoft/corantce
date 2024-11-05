@@ -763,14 +763,15 @@ public class Types {
     String[] argTypes = new String[recursiveTypeIndexes.length];
     for (int i = 0; i < recursiveTypeIndexes.length; i++) {
       // GT_JOINER.join(builder, argumentTypes[i].toString());
-      argTypes[i] = "<" + argumentTypes[i].toString() + ">";
+      argTypes[i] = argumentTypes[i].toString();
     }
-    builder.append(Strings.join(", ", (Object[]) argTypes));
+    builder.append("<").append(Strings.join(", ", (Object[]) argTypes)).append(">");
     final Type[] argumentsFiltered = Objects.removeAt(argumentTypes, recursiveTypeIndexes);
     if (argumentsFiltered.length > 0) {
       // GT_JOINER.join(builder, (Object[]) argumentsFiltered);
-      builder.append(Strings.join(", ", Arrays.stream(argumentsFiltered).map(Types::anyToString)
-          .map(x -> "<" + x + ">").toArray()));
+      builder.append("<").append(
+          Strings.join(", ", Arrays.stream(argumentsFiltered).map(Types::anyToString).toArray()))
+          .append(">");
     }
   }
 
@@ -795,8 +796,10 @@ public class Types {
     }
     if (cls.getTypeParameters().length > 0) {
       // CTJ_JOINER.join(buf, (TypeVariable[]) cls.getTypeParameters());
-      buf.append(Strings.join(", ",
-          Arrays.stream(cls.getTypeParameters()).map(Types::anyToString).toArray()));
+      buf.append("<")
+          .append(Strings.join(", ",
+              Arrays.stream(cls.getTypeParameters()).map(Types::anyToString).toArray()))
+          .append(">");
     }
     return buf.toString();
   }
@@ -1586,8 +1589,9 @@ public class Types {
           parameterizedType.getActualTypeArguments());
     } else {
       // GT_JOINER.join(builder, parameterizedType.getActualTypeArguments());
-      builder.append(Strings.join(", ", Arrays.stream(parameterizedType.getActualTypeArguments())
-          .map(x -> "<" + anyToString(x) + ">").toArray()));
+      builder.append("<").append(Strings.join(", ", Arrays
+          .stream(parameterizedType.getActualTypeArguments()).map(Types::anyToString).toArray()))
+          .append(">");
     }
     return builder.toString();
   }
@@ -1623,10 +1627,26 @@ public class Types {
     final StringBuilder builder = new StringBuilder(typeVariable.getName());
     final Type[] bounds = typeVariable.getBounds();
     if (bounds.length > 0 && ((bounds.length != 1) || !Object.class.equals(bounds[0]))) {
-      builder.append(" extends ");
-      // AMP_JOINER.join(builder, typeVariable.getBounds());
-      builder.append(Strings.join(" & ",
-          Arrays.stream(typeVariable.getBounds()).map(Types::toString).toArray()));
+
+      // https://issues.apache.org/jira/projects/LANG/issues/LANG-1698
+      // There must be a better way to avoid a stack overflow on Java 17 and up.
+      // Bounds are different in Java 17 and up where instead of Object you can get an interface
+      // like Comparable.
+      final Type bound = bounds[0];
+      boolean append = true;
+      if (bound instanceof ParameterizedType) {
+        final Type rawType = ((ParameterizedType) bound).getRawType();
+        if (rawType instanceof Class && ((Class<?>) rawType).isInterface()) {
+          // Avoid recursion and stack overflow on Java 17 and up.
+          append = false;
+        }
+      }
+      if (append) {
+        builder.append(" extends ");
+        // AMP_JOINER.join(builder, typeVariable.getBounds());
+        builder.append(Strings.join(" & ",
+            Arrays.stream(typeVariable.getBounds()).map(Types::toString).toArray()));
+      }
     }
     return builder.toString();
   }

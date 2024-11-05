@@ -70,8 +70,7 @@ public abstract class AbstractCompilableScriptProcessor extends AbstractScriptPr
     final Script script = fetchQuery.getPredicateScript();
     if (script.isValid()) {
       shouldBeTrue(supports(script));
-      return compileFunction(fetchQuery.getPredicateScript(), PARAMETER_FUNC_PARAMETER_NAME,
-          RESULT_FUNC_PARAMETER_NAME);
+      return compileFunction(script, PARAMETER_FUNC_PARAMETER_NAME, RESULT_FUNC_PARAMETER_NAME);
     }
     return null;
   }
@@ -91,8 +90,6 @@ public abstract class AbstractCompilableScriptProcessor extends AbstractScriptPr
       String parameterPName, String resultPName) {
     return getParamResultFunctions().computeIfAbsent(script.getId(), k -> {
       try {
-        logger.fine(() -> format("Compile query script [id:%s], current thread [name:%s, id:%s]",
-            script.getId(), Thread.currentThread().getName(), Thread.currentThread().getId()));
         final Compilable se = getCompilable(script.getType());
         final CompiledScript cs = se.compile(shouldNotBlank(script.getCode()));
         return pns -> {
@@ -118,8 +115,6 @@ public abstract class AbstractCompilableScriptProcessor extends AbstractScriptPr
       String fetchResultPName) {
     return getParamResultPairFunctions().computeIfAbsent(script.getId(), k -> {
       try {
-        logger.fine(() -> format("Compile query script [id:%s], current thread [name:%s, id:%s]",
-            script.getId(), Thread.currentThread().getName(), Thread.currentThread().getId()));
         final Compilable se = getCompilable(script.getType());
         final CompiledScript cs = se.compile(shouldNotBlank(script.getCode()));
         return pns -> {
