@@ -19,7 +19,6 @@ import java.util.List;
  * corant-modules-json
  *
  * @author bingo 下午2:23:27
- *
  */
 public interface Node<T> {
 
@@ -27,5 +26,9 @@ public interface Node<T> {
 
   List<? extends Node<?>> getChildren();
 
+  Node<?> getParent();
+
   T getValue(EvaluationContext ctx);
+
+  void setParent(Node<?> parent);
 }

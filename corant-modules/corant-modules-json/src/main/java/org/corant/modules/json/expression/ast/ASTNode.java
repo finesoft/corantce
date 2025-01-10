@@ -13,10 +13,11 @@
  */
 package org.corant.modules.json.expression.ast;
 
-import static org.corant.shared.util.Conversions.toBoolean;
+import static org.corant.shared.util.Assertions.shouldInstanceOf;
+
 import java.util.ArrayList;
 import java.util.List;
-import org.corant.modules.json.expression.EvaluationContext;
+
 import org.corant.modules.json.expression.Node;
 import org.corant.shared.exception.NotSupportedException;
 
@@ -24,13 +25,8 @@ import org.corant.shared.exception.NotSupportedException;
  * corant-modules-json
  *
  * @author bingo 下午5:04:44
- *
  */
 public interface ASTNode<T> extends Node<T> {
-
-  default void accept(ASTNodeVisitor visitor) {
-    visitor.visit(this);
-  }
 
   @Override
   default boolean addChild(Node<?> child) {
@@ -38,40 +34,54 @@ public interface ASTNode<T> extends Node<T> {
   }
 
   @Override
-  default List<? extends Node<?>> getChildren() {
+  default List<? extends ASTNode<?>> getChildren() {
     throw new NotSupportedException();
   }
 
   ASTNodeType getType();
 
+  default void postConstruct() {
+
+  }
+
   /**
    * corant-modules-json
    *
-   * @author bingo 下午2:22:18
+   * @author bingo 18:17:14
    */
-  class ASTTernaryNode implements ASTNode<Object> {
+  abstract class AbstractASTNode<T> implements ASTNode<T> {
+    protected ASTNode<?> parent;
+    protected final List<ASTNode<?>> children = new ArrayList<>();
 
-    protected List<ASTNode<?>> children = new ArrayList<>();
-
+    @SuppressWarnings("unchecked")
     @Override
     public boolean addChild(Node<?> child) {
+      shouldInstanceOf(child, ASTNode.class).setParent(this);
       return children.add((ASTNode<?>) child);
     }
 
     @Override
-    public List<? extends Node<?>> getChildren() {
+    public List<? extends ASTNode<?>> getChildren() {
       return children;
     }
 
     @Override
-    public ASTNodeType getType() {
-      return ASTNodeType.TERNARY;
+    public ASTNode<?> getParent() {
+      return parent;
     }
 
     @Override
-    public Object getValue(EvaluationContext ctx) {
-      return toBoolean(getChildren().get(0).getValue(ctx)) ? getChildren().get(1).getValue(ctx)
-          : getChildren().get(2).getValue(ctx);
+    public void postConstruct() {
+      if (children.size() == 1 && children.get(0) instanceof ASTArrayNode) {
+    	ASTArrayNode an = (ASTArrayNode) children.get(0);  
+        children.clear();
+        an.getChildren().forEach(this::addChild);
+      }
+    }
+
+    @Override
+    public void setParent(Node<?> parent) {
+      this.parent = (ASTNode<?>) parent;
     }
   }
 }

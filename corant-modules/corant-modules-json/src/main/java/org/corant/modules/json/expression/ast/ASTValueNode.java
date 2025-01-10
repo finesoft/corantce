@@ -14,15 +14,15 @@
 package org.corant.modules.json.expression.ast;
 
 import org.corant.modules.json.expression.EvaluationContext;
+import org.corant.modules.json.expression.Node;
 
 /**
  * corant-modules-json
  *
  * @author bingo 下午5:04:44
- *
  */
 public class ASTValueNode implements ASTNode<Object> {
-
+  protected ASTNode<?> parent;
   protected final Object value;
 
   public ASTValueNode(Object value) {
@@ -30,13 +30,23 @@ public class ASTValueNode implements ASTNode<Object> {
   }
 
   @Override
+  public ASTNode<?> getParent() {
+    return parent;
+  }
+
+  @Override
   public ASTNodeType getType() {
-    return ASTNodeType.VAL;
+    return ASTNodeType.VALUE;
   }
 
   @Override
   public Object getValue(EvaluationContext ctx) {
     return value;
+  }
+
+  @Override
+  public void setParent(Node<?> parent) {
+    this.parent = (ASTNode<?>) parent;
   }
 
   public Object value() {

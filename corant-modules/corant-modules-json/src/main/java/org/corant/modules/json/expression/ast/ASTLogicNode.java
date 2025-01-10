@@ -13,9 +13,6 @@
  */
 package org.corant.modules.json.expression.ast;
 
-import static org.corant.shared.util.Assertions.shouldInstanceOf;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.function.Predicate;
 import org.corant.modules.json.expression.EvaluationContext;
 import org.corant.modules.json.expression.Node;
@@ -24,16 +21,11 @@ import org.corant.modules.json.expression.Node;
  * corant-modules-json
  *
  * @author bingo 下午9:27:26
- *
  */
 public interface ASTLogicNode extends ASTPredicateNode {
 
-  @Override
-  List<ASTPredicateNode> getChildren();
+  abstract class AbstractASTLogicNode extends AbstractASTNode<Boolean> implements ASTLogicNode {
 
-  abstract class AbstractASTLogicNode implements ASTLogicNode {
-
-    protected final List<ASTPredicateNode> children = new ArrayList<>();
     protected final ASTNodeType type;
 
     AbstractASTLogicNode(ASTNodeType type) {
@@ -41,21 +33,11 @@ public interface ASTLogicNode extends ASTPredicateNode {
     }
 
     @Override
-    public boolean addChild(Node<?> child) {
-      return children.add(shouldInstanceOf(child, ASTPredicateNode.class));
-    }
-
-    @Override
-    public List<ASTPredicateNode> getChildren() {
-      return children;
-    }
-
-    @Override
     public ASTNodeType getType() {
       return type;
     }
 
-    protected boolean removeChildIf(Predicate<ASTPredicateNode> filter) {
+    protected boolean removeChildIf(Predicate<ASTNode<?>> filter) {
       return children.removeIf(filter);
     }
   }
@@ -68,7 +50,7 @@ public interface ASTLogicNode extends ASTPredicateNode {
 
     @Override
     public Boolean getValue(EvaluationContext ctx) {
-      return children.stream().allMatch(n -> n.getValue(ctx));
+      return children.stream().allMatch(n -> (Boolean) n.getValue(ctx));
     }
   }
 
@@ -80,7 +62,7 @@ public interface ASTLogicNode extends ASTPredicateNode {
 
     @Override
     public Boolean getValue(EvaluationContext ctx) {
-      return children.stream().noneMatch(n -> n.getValue(ctx));
+      return children.stream().noneMatch(n -> (Boolean) n.getValue(ctx));
     }
   }
 
@@ -98,7 +80,7 @@ public interface ASTLogicNode extends ASTPredicateNode {
 
     @Override
     public Boolean getValue(EvaluationContext ctx) {
-      return !children.get(0).getValue(ctx);
+      return !(Boolean) children.get(0).getValue(ctx);
     }
 
   }
@@ -111,7 +93,7 @@ public interface ASTLogicNode extends ASTPredicateNode {
 
     @Override
     public Boolean getValue(EvaluationContext ctx) {
-      return children.stream().anyMatch(n -> n.getValue(ctx));
+      return children.stream().anyMatch(n -> (Boolean) n.getValue(ctx));
     }
   }
 
@@ -123,7 +105,8 @@ public interface ASTLogicNode extends ASTPredicateNode {
 
     @Override
     public Boolean getValue(EvaluationContext ctx) {
-      return Boolean.logicalXor(children.get(0).getValue(ctx), children.get(1).getValue(ctx));
+      return Boolean.logicalXor((Boolean) children.get(0).getValue(ctx),
+          (Boolean) children.get(1).getValue(ctx));
     }
   }
 

@@ -15,6 +15,7 @@ package org.corant.modules.json.expression.ast;
 
 import static org.corant.shared.util.Strings.isBlank;
 import static org.corant.shared.util.Strings.strip;
+
 import org.corant.modules.json.expression.ast.ASTComparisonNode.ASTBetweenNode;
 import org.corant.modules.json.expression.ast.ASTComparisonNode.ASTEqualNode;
 import org.corant.modules.json.expression.ast.ASTComparisonNode.ASTGreaterThanEqualNode;
@@ -31,16 +32,24 @@ import org.corant.modules.json.expression.ast.ASTLogicNode.ASTLogicNorNode;
 import org.corant.modules.json.expression.ast.ASTLogicNode.ASTLogicNotNode;
 import org.corant.modules.json.expression.ast.ASTLogicNode.ASTLogicOrNode;
 import org.corant.modules.json.expression.ast.ASTLogicNode.ASTLogicXorNode;
-import org.corant.modules.json.expression.ast.ASTNode.ASTTernaryNode;
 import org.corant.modules.json.expression.ast.ASTVariableNode.ASTDefaultVariableNode;
 
 /**
  * corant-modules-json
  *
  * @author bingo 下午5:13:27
- *
  */
 public enum ASTNodeType {
+
+  /**
+   * The return node.
+   */
+  RETURN("$ret", false) {
+    @Override
+    public ASTNode<?> buildNode(Object object) {
+      return new ASTReturnNode();
+    }
+  },
 
   /**
    * Performs an AND operation on an array with at least two expressions and returns the objects
@@ -87,23 +96,13 @@ public enum ASTNodeType {
   },
 
   /**
-   * Performs a XOR operation on an array with at least two expressions and returns the objects that
-   * do not meet any of the expressions.
+   * Performs an XOR operation on an array with at least two expressions and returns the objects
+   * that do not meet any of the expressions.
    */
   LG_XOR("$xor", false) {
     @Override
     public ASTNode<?> buildNode(Object object) {
       return new ASTLogicXorNode();
-    }
-  },
-
-  /**
-   * Performs a ternary operation on an array with three expressions.
-   */
-  TERNARY("$?", false) {
-    @Override
-    public ASTNode<?> buildNode(Object object) {
-      return new ASTTernaryNode();
     }
   },
 
@@ -216,13 +215,14 @@ public enum ASTNodeType {
     }
   },
 
+
   /**
-   * The return node.
+   * The function node
    */
-  RETURN("$ret", false) {
+  FUN("#", false) {
     @Override
     public ASTNode<?> buildNode(Object object) {
-      return new ASTReturnNode();
+      return new ASTDefaultFunctionNode(object.toString().substring(1));
     }
   },
 
@@ -239,7 +239,7 @@ public enum ASTNodeType {
   /**
    * The value node
    */
-  VAL("", true) {
+  VALUE("", true) {
     @Override
     public ASTNode<?> buildNode(Object object) {
       return new ASTValueNode(object);
@@ -247,12 +247,22 @@ public enum ASTNodeType {
   },
 
   /**
-   * The function node
+   * The array node
    */
-  FUN("#", false) {
+  ARRAY("", false) {
     @Override
     public ASTNode<?> buildNode(Object object) {
-      return new ASTDefaultFunctionNode(object.toString().substring(1));
+      return new ASTArrayNode();
+    }
+  },
+
+  /**
+   * The object node
+   */
+  OBJECT("", false) {
+    @Override
+    public ASTNode<?> buildNode(Object object) {
+      return new ASTObjectNode();
     }
   };
 
@@ -284,7 +294,7 @@ public enum ASTNodeType {
         }
       }
     }
-    return ASTNodeType.VAL;
+    return null;
   }
 
   public abstract ASTNode<?> buildNode(Object object);

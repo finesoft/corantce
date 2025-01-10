@@ -623,6 +623,36 @@ public class Maps {
   }
 
   /**
+   * Returns the value corresponding to the given key path in the given object. The given object can
+   * be a map, a collection of maps, or an array of maps. If the value corresponding to the key path
+   * is a collection or an array, the elements of the value are extracted and added one by one to an
+   * intermediate temporary list if the given {@code flatten} is true, otherwise the value is added
+   * as a whole to the intermediate temporary list.
+   * <p>
+   * <b>The first element of the intermediate temporary list is taken as the result, and the result
+   * is forced to be type-converted according to the expected return type.</b>
+   * <p>
+   * Note: If the value returned by this method is changed by another processing, it is not
+   * guaranteed that it will affect the given object.
+   *
+   * @param <T> the expected return type
+   * @param object the object to be lookup from
+   * @param keyPath the key path
+   * @param flatten flatten the value if value is an iterable or an array
+   */
+  public static <T> T getMapKeyPathValue(Object object, Object[] keyPath, boolean flatten) {
+    List<Object> holder = new ArrayList<>();
+    iterateMapValue(object, keyPath, 0, flatten, false, holder);
+    if (holder.isEmpty()) {
+      return null;
+    } else {
+      T value = forceCast(holder.get(0));
+      holder.clear();
+      return value;
+    }
+  }
+  
+  /**
    * Return the value corresponding to the given key path in the given object. The given object can
    * be a Map, or a collection of Maps or an array of Maps. If the value retrieved is not a
    * collection and array, it will be added into a list and return.

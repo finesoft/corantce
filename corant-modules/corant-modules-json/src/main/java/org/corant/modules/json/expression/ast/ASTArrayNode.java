@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2021, Bingo.Chen (finesoft@gmail.com).
+ * Copyright (c) 2013-2023, Bingo.Chen (finesoft@gmail.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
@@ -13,16 +13,29 @@
  */
 package org.corant.modules.json.expression.ast;
 
+import java.util.ArrayList;
+import java.util.stream.Collectors;
 import org.corant.modules.json.expression.EvaluationContext;
+import org.corant.modules.json.expression.ast.ASTNode.AbstractASTNode;
 
 /**
  * corant-modules-json
  *
- * @author bingo 下午9:25:56
+ * @author bingo 18:19:29
  */
-public interface ASTPredicateNode extends ASTNode<Boolean> {
+public class ASTArrayNode extends AbstractASTNode<Object> {
 
   @Override
-  Boolean getValue(EvaluationContext ctx);
+  public ASTNodeType getType() {
+    return ASTNodeType.ARRAY;
+  }
+
+  @Override
+  public Object getValue(EvaluationContext ctx) {
+    if (children.isEmpty()) {
+      return new ArrayList<>();
+    }
+    return children.stream().map(c -> c.getValue(ctx)).collect(Collectors.toList());
+  }
 
 }

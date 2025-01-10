@@ -13,31 +13,56 @@
  */
 package org.corant.modules.json.expression.ast;
 
+import static org.corant.shared.normal.Names.splitNameSpace;
+import static org.corant.shared.util.Assertions.shouldBeTrue;
 import static org.corant.shared.util.Assertions.shouldNotBlank;
 import static org.corant.shared.util.Strings.strip;
+import java.util.Arrays;
 import org.corant.modules.json.expression.EvaluationContext;
+import org.corant.modules.json.expression.Node;
+import org.corant.modules.json.expression.ParseException;
 
 /**
  * corant-modules-json
  *
  * @author bingo 下午10:24:55
- *
  */
 public interface ASTVariableNode extends ASTNode<Object> {
 
   String getName();
 
+  default String[] getNamespace() {
+    String[] array = splitNameSpace(getName(), true, false);
+    return Arrays.copyOf(array, array.length);
+  }
+
   class ASTDefaultVariableNode implements ASTVariableNode {
 
+    protected ASTNode<?> parent;
     protected final String name;
+    protected final String[] namespace;
 
     public ASTDefaultVariableNode(String name) {
-      this.name = shouldNotBlank(strip(name));
+      this.name = shouldNotBlank(strip(name),
+          () -> new ParseException("AST node [%s] must have a name", ASTNodeType.VAR.token));
+      namespace = splitNameSpace(this.name, true, false);
+      shouldBeTrue(namespace.length > 0,
+          () -> new ParseException("AST node [%s] name error", ASTNodeType.VAR.token));
     }
 
     @Override
     public String getName() {
       return name;
+    }
+
+    @Override
+    public String[] getNamespace() {
+      return Arrays.copyOf(namespace, namespace.length);
+    }
+
+    @Override
+    public ASTNode<?> getParent() {
+      return parent;
     }
 
     @Override
@@ -48,6 +73,11 @@ public interface ASTVariableNode extends ASTNode<Object> {
     @Override
     public Object getValue(EvaluationContext ctx) {
       return ctx.resolveVariableValue(this);
+    }
+
+    @Override
+    public void setParent(Node<?> parent) {
+      this.parent = (ASTNode<?>) parent;
     }
 
   }
